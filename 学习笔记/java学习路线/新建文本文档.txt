@@ -1,0 +1,64 @@
+1.javaSE
+《JAVA核心技术 卷1》
+（https://zhuanlan.zhihu.com/p/341548159）
+解惑真小白的苦恼 | 类的对象，对象引用，对象实例，引用变量
+Random的用法
+深入理解static关键字
+深入理解抽象类与接口
+【java基础之继承】java继承从“我爸是李刚”讲起
+【java基础之多态】理解多态的向上向下转型从“妈妈我想吃烤山药”讲起
+【java基础之代码块】Static静态代码块以及各代码块之间的执行顺序
+【java基础之异常】死了都要try，不淋漓尽致地catch我不痛快！
+【java基础之匿名内部类】程序员你真的理解匿名内部类吗？
+【java基础之tostring】为什么重写toString()方法？
+【java基础之泛型】泛型
+【java基础之反射】程序员你真的理解反射机制吗？
+史上最骚最全最详细的IO流教程，没有之一！
+【java基础之测试】序员你确定这十个题你都会吗？
+java抽象类（abstract）与接口（Interface）
+java面试官：兄弟简单谈谈Static、final、Static final各种用法吧
+java中的重载与重写
+Java静态static详解
+Java中equals与“==”的区别详解
+java基础之 “==”和“ equals”以及instanceof的区别
+Object类、Date类、System类、StringBuilder类、包装类
+什么是浮点型？什么是单精度浮点数（float）以及双精度浮点数（double）？
+java数组定义、使用、以及数组内存分析详解
+Collection集合以及Iterator迭代器实现原理
+List、Set集合系列之剖析HashSet存储原理（HashMap底层）
+Collection和Collections之间的使用与区别（顺带讲解Comparable与Comparator区别）
+Java中的多线程你只要看这一篇就够了
+java中的transient关键字详解
+谈谈你对抽象类和接口的理解
+面向对象，集合，IO，
+二.前端部分
+html,css  做个小页面
+.JavaWeb基础
+Servlet，tomcat，request和response很重要，request域超级重要。
+cookie、session、JSP很重要。session域超级重要
+监听器和过滤器listenr,filter，Ajax
+.JavaWeb进阶
+Linux，操作系统原理，数据结构与算法，SSM框架，
+理解Spring的两个特性：IOC 反转控制和DI 依赖注入
+三.
+112节Redis 49节MongoDB
+四.
+MAVEN
+spring cloud,Restful API设计风格
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

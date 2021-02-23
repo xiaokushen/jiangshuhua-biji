@@ -1,0 +1,341 @@
+一.windows下的redis
+1.redis-server:相当于启动了redis服务器,提供对应功能。
+2.redis.windows.conf:redis的配置文件(configration)
+3.redis-cli:对redis的功能执行相应的操作。（先打开1后打开3）
+4.redis-check-aof：持久化使用
+5.redis-check-aof：做性能测试
+
+二.
+1.port:redis的端口号6379
+2.PID：每启动一个redis服务，就是启动了一个redis对象，PID就是对象的标识。
+3.redis退出：quit   exit  
+4.通过cmd方式打开cli操作:
+C:\Users\江书华>d:
+D:\>cd redis
+D:\redis>redis-cli
+127.0.0.1:6379>
+5.exists  key;	查看某个key是否存在
+
+
+三.MongoDB是-个介于关系型数据库和非关系型数据中中间的产品! MongoDB是非关系型数据库中功能最丰富,最像关
+系型数据库的! 
+Redis能干嘛?
+内存存储、持久化,内存中是断电即失、所以说持久化很重要( rdb、aof )
+效率高，可以用于高速缓存
+发布订阅系统
+地图信息分析
+计时器、计数器(浏览量!)
+读的速度是110000次/s,写的速度是81000次/s 
+明白Redis是很快的,官方表示, Redis是基于内存操作, CPU不是Redis性能瓶颈, Redis的瓶颈是根据机器的内存和网络带
+宽,既然可以使用单线程来实现,就使用单线程了!
+
+redis特性
+1、多样的数据类型
+2、持久化
+3、集群
+4、事务
+
+redis的默认数据库的个数是16个
+选择数据库:select  0;           选择0号数据库
+查看当前数据库的大小：DBSIZE；
+查看数据库所有的key:  key  *  
+清空当前数据库所有数据：flushdb
+清空所有数据库所有数据：flushall
+
+四.单线程和多线程
+什么是线程？
+线程是程序中的一个执行流，每个zhi线程都有自己的专有寄存器(栈指针、程序计数器等)，但代码区是共享的，
+即不同的线程可以执行同样的函数。
+什么是多线程？
+多线程是指程序中包含多个执行流，即在一个程序中可以同时运行多个不同的线程来执行不同的任务，
+也就是说允许单个程序创建多个并行执行的线程来完成各自的任务。
+多线程的好处：
+可以提高CPU的利用率。在多线程程序中，一个线程必须等待的时候，CPU可以运行其它的线程而不是等待，
+这样就大大提高了程序的效率。
+多线程与单线程的区别
+生活举例
+你早上上班，正要打卡的时候，手机响了。你如果先接了电话，等接完了，在打卡，就是单线程。
+如果你一手接电话，一手打卡。就是多线程。
+2件事的结果是一样的。你接了电话且打了卡。
+
+Redis为什么单线程还这么快?
+1、误区1 :高性能的服务器一 定是多线程的?
+2、误区2:多线程( CPU上下文会切换! ) - -定比单线程效率高!
+先去CPU>内存>硬盘的速度要有所了解!
+核心: redis是将所有的数据全部放在内存中的,所以说使用单线程去操作效率就是最高的,多线程( CPU上下文会切换:耗
+时的操作! ! ! ) , 对于内存系统来说,如果没有上下文切换效率就是最高的!多次读写都是在一个CPU 上的,在内存情况
+下,这个就是最佳的方案!
+
+事务
+Redis事务本质: -组命令的集合! -个事务中的所有命令都会被序列化,在事务执行过程的中,会按照顺序执行!
+一次性、 顺序性、排他性!执行- -些列的命令!
+------ 队列set set set执行------
+Redis事务没有没有隔离级别的概念!
+所有的命令在事务中,并没有直接被执行!只有发起执行命令的时候才会执行! Exec
+Redis单条命令式保存原子性的,但是事务不保证原子性!
+redis的事务:
+●开启事务( multi)
+●命令入队( )
+●执行事务(exec )
+127.0.0.1:6379> multi      #开启事务
+0K
+127.0.0.1:6379> set k1 v1        #命令入队
+QUEUED
+127.0.0. 1:6379> set k2 v2
+QUEUED
+127.0.0.1:6379> get k2
+QUEUED
+127.0.0. 1:6379> set k3 v3
+QUEUED
+127.0.0.1 :6379> exec            #执行事务
+1)0K
+2) 0K
+3)”v2"
+4) 0K
+中途取消事务的操作：discard  
+编译型异常:如果事务中的命令存在一个错误，那么所有的命令都不会执行：
+127 . 0.0.1:6379> multi
+0K
+127.0.0.1:6379> set k1 v1
+QUEVED
+127.0.0.1:6379> set k2 v2
+QUEUED
+127 . 0.0.1:6379> set k3 v3
+QUEUED
+127.0.0.1:6379> getset k3
+(error) ERR wrong number of arguments for ' getset' command
+127 . 0.0.1:6379> set k4 v4
+QUEUED
+127.0.0.1:6379> set k5 v5
+QUEUED
+127，0.0.1:6379> exec
+(error) EXECABORT Transaction discarded because of previous errors.
+运行时异常（比如1/0这个只会在运行时报错）：那么只有该错误的命令不会执行，其它的都会执行。
+127.0.0. 1:6379> set k1 "v1"
+0K
+127 . 0.0.1:6379> multi
+0K
+127 .0.0.1:6379> incr k1  	#incr  的意思是对变量k1+1操作，因为k1是字符串，所以错误
+QUEUED
+127.0.0. 1:6379> set k2 v2
+QUEUED
+127.0.0.1 :6379> set k3 v3
+QUEUED 
+127 .0.0.1:6379> get k3
+QUEUED
+127.0.0.1:6379> exec
+1) (error) ERR value is not an integer or out of range 
+2) 0K
+3) OK
+4) "v3"
+综上所述：事务在mqsql中是有原子性的，但是在redis中事务不存在原子性，因为运行时错误其它命令照样执行。
+
+监控! Watch
+悲观锁:
+●很悲观,认为什么时候都会出问题,无论做什么都会加锁!
+乐观锁:
+●很乐观，认为什么时候都不会出问题,所以不会上锁!更新数据的时候去判断一下,在此期间是否有人修改过这个数据，
+●获取version
+●更新的时候比较version
+乐观锁介绍：（乐观锁主要用于抢红包，淘宝抢购，秒杀之类）
+乐观锁（ Optimistic Locking ） 相对悲观锁而言，乐观锁假设认为数据一般情况下不会造成冲突，所以在数据进行提交更新的时候，才会正式对数据的冲突与否进行检测，
+如果发现冲突了，则让返回用户错误的信息，让用户决定如何去做。那么我们如何实现乐观锁呢，一般来说有以下2种方式：
+1.使用数据版本（Version）记录机制实现，这是乐观锁最常用的一种实现方式。
+何谓数据版本？即为数据增加一个版本标识，一般是通过为数据库表增加一个数字类型的 “version” 字段来实现。
+version版本号怎么确定？ --linux中：
+每个key操作是，都有版本号。
+其他客户端提交数据一次数据库版本号version就进行更新一次，本次事务提交的时候对比版本号（之前提交数据的情况），要是此次版本号低于数据库当前版本号，就会提交失败；
+当前版本如果比数据库中版本低，则提交失败。当读取数据时，将version字段的值一同读出，数据每更新一次，对此version值加一。当我们提交更新的时候，
+判断数据库表对应记录的当前版本信息与第一次取出来的version值进行比对，如果数据库表当前版本号与第一次取出来的version值相等，则予以更新，否则认为是过期数据。
+
+如何保障mysql和redis之间的数据一致性？
+
+Jedis
+我们要使用Java来操作Redis
+什么是Jedis是Redis官方推荐的java连接开发工具!使用Java 操作Redis中间件! 如果你要使用java操作redis ,那么- -定要
+对Jedis十分的熟悉!
+package kuang;
+import redis.clients.jedis.Jedis;
+public class TestPing {
+    public static void main(String[] args) {
+        Jedis jedis = new Jedis("127.0.0.1",6379);
+        System.out.println(jedis.ping());
+    }
+}
+输出：PONG     表示连接成功
+
+
+SpringBoot整合
+SpringBoot操作数据: spring-data-jpa  spring-data-jdbc   spring-data-mongodb    spring-data-redis !
+SpringData也是和SpringBoot齐名的项目!|
+redis源码:
+public class RedisAutoConfiguration {
+    public RedisAutoConfiguration() {
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(
+        name = {"redisTemplate"}
+    )
+    @ConditionalOnSingleCandidate(RedisConnectionFactory.class)
+    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+	//redis对象都是需要序列化
+	//两个泛型都是object
+        RedisTemplate<Object, Object> template = new RedisTemplate();
+        template.setConnectionFactory(redisConnectionFactory);
+        return template;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+//由于string是redis最常用的类型，所以说单独提出来了一个bean
+    @ConditionalOnSingleCandidate(RedisConnectionFactory.class)
+    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        StringRedisTemplate template = new StringRedisTemplate();
+        template.setConnectionFactory(redisConnectionFactory);
+        return template;
+    }
+}
+springboot整合redis过程
+1.导入依赖：使用spring initliate 来创建，前三个都打勾，spring web打勾，mgongdb打勾。对应的依赖就生成了。
+2.配置连接：
+spring.redis.host=127.0.0.1
+spring.redis.port=6379
+3.测试：
+@SpringBootTest
+class Redis01SpringbootApplicationTests {
+    @Autowired
+    private RedisTemplate redisTemplate;//事务的基本操作和CRUD都可以用它
+    @Test
+    void contextLoads() {
+        //操作字符串   类似string
+        redisTemplate.opsForValue().set("aaa","关注狂神说");
+        System.out.println(redisTemplate.opsForValue().get("aaa"));
+// redisTemplate 操 作不同的数据类型，api 和我们的指令是一一样的
+// opsForValue操作字待串 类似String
+// opsForlist
+// opsForSet
+// opsForHash
+// opsForZSet
+// opsForGeo
+// opsForHyperlogLog
+        //操作list
+//        redisTemplate.opsForList()
+        //获取redis的连接对象 ，连接数据库
+//        RedisConnection connection = redisTemplate.getConnectionFactory().getConnection();
+//        connection.flushDb();
+//        connection.flushAll();
+    }
+}
+
+localhost、127.0.0.1和本机IP的区别如下：
+1、首先 localhost 是一个域名，在过去它指向 127.0.0.1 这个IP地址。
+
+五.总结
+与MySQL数据库不同，Redis这类内存数据库的载体是内存，内存小容量的特性使得它们必须要有更好的数据淘汰策略和持久化策略。
+Redis在数据淘汰这一块做了很复杂的设计，有针对过期数据的，也有在内存不够用时针对未过期数据的。并且提供了多种淘汰数据的
+策略，层层递进，平衡时间开销和空间开销，使Redis数据库在不同的操作系统，不同状态下都能保证高可用性。
+redis要序列化对象是使对象可以跨平台存储和进行网络传输。因为存储和网络传输都需要把一个对象状态保存成一种跨平台识别的字
+节格式，然后其他的平台才可以通过字节信息解析还原对象信息，所以进行“跨平台存储”和”网络传输”的数据都需要进行序列化。
+
+
+
+
+
+
+
+二.Linux下的redis   centOS系统
+linux的远程连接
+方法一：1.确保你的Linux机器正确的IP地址
+通过ip  addr  show  查看网络ip信息：192.168.28.128/24 
+2.首次安装好xshell,且运行后，建立会话
+方法二：在xshell连接命令中输入ssh root@192.168.28.128
+用xshell将windows的安装包装送到linux的步骤
+1.使用 yum provides */rz 这条命令，查看你系统自带的软件包的信息。
+2.在输出的信息中可以看到 rz的位置 filename：/user/bin/rz。说明包是存在的。
+3.确定rz包是存在于你系统后，使用命令：yum install -y lrzsz，进行包的安装。
+4.安装好后，接下来你就可以使用  rz 命令进行本地文件上传至linux服务器这个操作了。敲命令 rz ，找到你上传的文件。
+
+linux:
+1.cd  跳转到其它文件夹，区分大小写
+2.pwd  输出你当前的位置
+3.mkdir redis  创建redis问价夹
+[root@aubin Music]:  root:登入的用户    @：占位符（无意义）  aubin：当前机器的主机名 Music：当前所在的文件夹
+4.wget http://download.redis.io/releases/redis-5.0.7.tar.gz   下载链接
+5.ctrl+c终止下载
+6.rm   -r 就是向下递归，不管有多少级目录，一并删除 -f 就是直接强行删除，不作任何提示的意思
+7.mv /root/redis/redis-6.2-rc3 /usr/local/redis  文件移动
+8.返回上i及  cd  ..
+9.clear  清屏幕
+10
+
+vim:
+1.命令模式 用户刚刚启动vi/vim,便进入了命令模式。 
+2) 文本输入模式
+在命令模式下输入插入命令i、附加命令a、打开命令o、修改命令c、取代命令r或替换命令s都可以进入文本输入模式。
+在文本输入过程中，若想回到命令模式下，按下Esc键即可。
+3) 末行模式
+末行模式也称 ex 转义模式。
+在命令模式下，用户按:键即可进入末行模式下，此时 vi 会在显示窗口的最后一行（通常也是屏幕的最后一行）显示一个:作为末行模式的说明符，等待用户输入命令。多数文件管理命令都是在此模式下执行的（如把编辑缓冲区的内容写到文件中等）。
+末行命令执行完后，vi 自动回到命令模式。
+vi 工作模式之间的切换
+如果要从命令模式转换到编辑模式，可以输入命令a或者i。
+如果需要从文本模式返回，则按下Esc键即可。
+在命令模式下输入:即可切换到末行模式，然后输入命令。
+
+redis-cli无法使用的问题：sudo cp src/redis-cli /usr/local/bin/
+
+
+连接Linux
+1.回到根目录
+2.cd usr/local/redis/redis-6.2-rc3/src
+3.redis-cli
+4.要启动多个redis（xshell下鼠标右键复制会话）
+4.1 换端口：1号会话修改为redis-server --port 6380
+2号会话： redis-cli -p 6380
+现在展示企业级开启多个redis
+1.1号会话  ，在redis的目录下找到redis.conf : cat  redis.conf
+ 因为里面内容太多我们进行注释：cat redis.conf  | grep -v "#" |grep -v "^$"  （把注释#给过滤掉，把空格给过滤掉）
+cat redis.conf  | grep -v "#" |grep -v "^$" > redis-6379.conf    原始的redis.conf文件不要动，我们去修改它，通过>号把它放到 redis-6379.conf 
+（系统自动新建redis-6379.conf）中
+2.vim redis-6379.conf
+3.只保留
+port 6379
+daemonize yes
+logfile "6379.log"
+dir /redis-6.2-rc3/data
+2号会话：回到redis-6.2-rc3目录下 ： mkdir data   之后cd data 再pwd      将pwd显示的路径复制到dir  /.....中
+回到1号会话：redis-server redis-6379.conf  就用这个配置启动了
+4. ps -ef | grep redis-   查看进程，该服务启动没有
+5.在redis-6.2-rc3创建conf文件夹，将redis-6379.conf 放进去
+再次启动该服务：redis-server /conf/redis-6379.conf
+ ps -ef | grep redis-   查看进程，该服务启动没有
+6.cp  redis-6379.conf   redis-6380.conf  (复制同一份但是不同名字，第二份redis)
+vim redis-6380.conf  将里面的值进行修改即可：
+port 6380
+daemonize yes
+logfile "6380.log"
+dir /usr/local/redis/redis-6.2-rc3/data
+：wq保存退出
+[root@aubin redis-6.2-rc3]# redis-server conf/redis-6380.conf
+[root@aubin redis-6.2-rc3]# redis-server conf/redis-6380.conf
+输出：
+root       4491      1  0 22:48 ?        00:00:00 redis-server *:6380
+root       4508      1  0 22:49 ?        00:00:00 redis-server *:6379
+就成功了（最后回到redis-6.2-rc3的data下，生成了日志文件）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,35 @@
+1.在控制台ctrl+F查询具体的某个信息
+2.IDEA怎么开启终端 view→tool window→Terminal
+3.spring initializr不能联网的原因，网络防火墙要关闭，网络不好
+4.yml爆红的解决方法：邮件resources找到Mark Derectory  as,选择resources  root
+5.ctrl+o  重写方法的快捷键。
+6.类的结构视图:alt+7
+7.查看源码：ctrl+鼠标左键
+8.查看接口的实现类：Ctrl+Alt+B
+9.file -> other settings  全局配置，配置一次，以后的项目保留该配置。
+10.ctrl+shift+alt：多行操作
+11fori：生成for循环；
+Ctrl+Alt+v：自动补齐返回值类型
+ctrl+i：实现接口中的方法
+Ctrl+F：在当前文件中查找
+Ctrl+Shift+F:在全局文件中查找字符串
+
+1.update resources ---- 更新静态的资源，比如html,js,css等 运行模式和调试模式都是立即生效；
+2.update classes and resources ---- 更新java,jsp和静态资源（ 1. java修改后，会被编译成.class，然后覆盖到target/kao文件夹下，IDE调试模式的情况下，立即生效。IDE运行模式下，不立即生效，需要redeployed才可生效。jsp修改后，再次被访问的时候，会自动更新，重新编译成java.class保存在tomcat的work目录下。由于是访问时才检测是否修改，是否需要重新编译，所以 IDE 运行模式 和IDEA调试模式下，都是立即生效。刷新下页面就可）；
+3.redeployed ----- 重新部署，发布到tomcat里，不重启tomcat，而是把原来的删掉，然后重新发布；
+4.restart server ----- 重启tomcat。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

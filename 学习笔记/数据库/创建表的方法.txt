@@ -1,0 +1,10 @@
+1.复制一张表并且包含数据
+CREATE table aaa SELECT * FROM `tables`.dept
+2.复制一张表不包含数据
+CREATE table a SELECT * FROM `tables`.dept WHERE 1=2;
+select *  from dept where  deptno  in(10,20,30)
+等价于 select *  from dept where  deptno =10  or  deptno =20  or deptno =30; 
+
+
+
+

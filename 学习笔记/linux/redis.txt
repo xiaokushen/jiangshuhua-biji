@@ -1,0 +1,95 @@
+一.cenTos
+linux的远程连接
+方法一：1.确保你的Linux机器正确的IP地址
+通过ip  addr  show  查看网络ip信息：192.168.28.128/24 
+2.首次安装好xshell,且运行后，建立会话
+方法二：在xshell连接命令中输入ssh root@192.168.28.128
+用xshell将windows的安装包装送到linux的步骤
+1.使用 yum provides */rz 这条命令，查看你系统自带的软件包的信息。
+2.在输出的信息中可以看到 rz的位置 filename：/user/bin/rz。说明包是存在的。
+3.确定rz包是存在于你系统后，使用命令：yum install -y lrzsz，进行包的安装。
+4.安装好后，接下来你就可以使用  rz 命令进行本地文件上传至linux服务器这个操作了。敲命令 rz ，找到你上传的文件。
+
+linux:
+1.cd  跳转到其它文件夹，区分大小写
+2.pwd  输出你当前的位置
+3.mkdir redis  创建redis问价夹
+[root@aubin Music]:  root:登入的用户    @：占位符（无意义）  aubin：当前机器的主机名 Music：当前所在的文件夹
+4.wget http://download.redis.io/releases/redis-5.0.7.tar.gz   下载链接
+5.ctrl+c终止下载
+6.rm   -r 就是向下递归，不管有多少级目录，一并删除 -f 就是直接强行删除，不作任何提示的意思
+7.mv /root/redis/redis-6.2-rc3 /usr/local/redis  文件移动
+8.返回上i及  cd  ..
+9.clear  清屏幕
+10
+
+vim:
+1.命令模式 用户刚刚启动vi/vim,便进入了命令模式。 
+2) 文本输入模式
+在命令模式下输入插入命令i、附加命令a、打开命令o、修改命令c、取代命令r或替换命令s都可以进入文本输入模式。
+在文本输入过程中，若想回到命令模式下，按下Esc键即可。
+3) 末行模式
+末行模式也称 ex 转义模式。
+在命令模式下，用户按:键即可进入末行模式下，此时 vi 会在显示窗口的最后一行（通常也是屏幕的最后一行）显示一个:作为末行模式的说明符，等待用户输入命令。多数文件管理命令都是在此模式下执行的（如把编辑缓冲区的内容写到文件中等）。
+末行命令执行完后，vi 自动回到命令模式。
+vi 工作模式之间的切换
+如果要从命令模式转换到编辑模式，可以输入命令a或者i。
+如果需要从文本模式返回，则按下Esc键即可。
+在命令模式下输入:即可切换到末行模式，然后输入命令。
+
+redis-cli无法使用的问题：sudo cp src/redis-cli /usr/local/bin/
+
+
+连接Linux
+1.回到根目录
+2.cd usr/local/redis/redis-6.2-rc3/src
+3.redis-cli
+4.要启动多个redis（xshell下鼠标右键复制会话）
+4.1 换端口：1号会话修改为redis-server --port 6380
+2号会话： redis-cli -p 6380
+现在展示企业级开启多个redis
+1.1号会话  ，在redis的目录下找到redis.conf : cat  redis.conf
+ 因为里面内容太多我们进行注释：cat redis.conf  | grep -v "#" |grep -v "^$"  （把注释#给过滤掉，把空格给过滤掉）
+cat redis.conf  | grep -v "#" |grep -v "^$" > redis-6379.conf    原始的redis.conf文件不要动，我们去修改它，通过>号把它放到 redis-6379.conf 
+（系统自动新建redis-6379.conf）中
+2.vim redis-6379.conf
+3.只保留
+port 6379
+daemonize yes
+logfile "6379.log"
+dir /redis-6.2-rc3/data
+2号会话：回到redis-6.2-rc3目录下 ： mkdir data   之后cd data 再pwd      将pwd显示的路径复制到dir  /.....中
+回到1号会话：redis-server redis-6379.conf  就用这个配置启动了
+4. ps -ef | grep redis-   查看进程，该服务启动没有
+5.在redis-6.2-rc3创建conf文件夹，将redis-6379.conf 放进去
+再次启动该服务：redis-server /conf/redis-6379.conf
+ ps -ef | grep redis-   查看进程，该服务启动没有
+6.cp  redis-6379.conf   redis-6380.conf  (复制同一份但是不同名字，第二份redis)
+vim redis-6380.conf  将里面的值进行修改即可：
+port 6380
+daemonize yes
+logfile "6380.log"
+dir /usr/local/redis/redis-6.2-rc3/data
+：wq保存退出
+[root@aubin redis-6.2-rc3]# redis-server conf/redis-6380.conf
+[root@aubin redis-6.2-rc3]# redis-server conf/redis-6380.conf
+输出：
+root       4491      1  0 22:48 ?        00:00:00 redis-server *:6380
+root       4508      1  0 22:49 ?        00:00:00 redis-server *:6379
+就成功了（最后回到redis-6.2-rc3的data下，生成了日志文件）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

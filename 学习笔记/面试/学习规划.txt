@@ -1,0 +1,16 @@
+熟悉JAVA、SSM框架、Spring Boot、Nginx、redis，mysql、oracle、MAVEN、SVN、前端任意一种框架；
+熟练使用Maven等的部署环境，熟练使用Git、Svn版本控制系统；
+基础扎实，能熟练完成基本sql编写和前端交互能力；
+熟悉关系型数据库以及相应数据库调优、SQL优化；熟悉Memcached、Redis缓存数据库；熟练使用Redis、Memcached等NoSQL技术；
+一年以上Java开发经验，熟悉JavaScript、JSP、Servlet相关技术，具有一定规模的项目开发经验；
+熟悉Jquery、JSP、Servlet、Html、JavaScript、CSS等前端开发技术；
+熟悉基本的服务器操作系统：WindowServer，LINUX等；
+对各种开源技术开源框架框架如Spring/SpringMVC/Spring boot/Hibernate/MyBatis/Tomcat等有较深入的了解及应用能力，
+对微服务框架及治理（dubbo、spring cloud），消息中间件MQ，有过一定了解；
+数据库的简单优化。20人以下的小公司要全会。
+
+多线程，redis,项目，linux的常用命令脚本，对JVM运行原理与常用配置有一定了解，熟悉jQuery的使用
+熟悉常用的数据库,例如:mysql，sqlserver，oracle；能熟练使用Java 8的各项新特性；
+
+
+

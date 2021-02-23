@@ -1,0 +1,1 @@
+、熟练编写java网络通信、多线程并发处理，优化代码性能能力； 熟练掌握bootstrap、easyui、dhtmlx、jquery框架应用及二次封装组件； 具备前后端分离思想；
