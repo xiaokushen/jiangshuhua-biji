@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery-3.4.1.js"></script>
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap.css">
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap-theme.css">
+    <script type="text/javascript" src="http://localhost:8080/js/bootstrap.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        table td, table th {
+            border: 1px solid #cad9ea;
+            color: #666;
+            height: 30px;
+        }
+
+        table thead th {
+            background-color: #CCE8EB;
+            width: 100px;
+        }
+
+        table tr:nth-child(odd) {
+            background: #fff;
+        }
+
+        table tr:nth-child(even) {
+            background: #F5FAFA;
+        }
+
+
+    </style>
+    <script>
+
+        // 表头
+    function getTable(){
+        var ss = "<tr>\n" +
+                "<th>\n" +
+        "<input type='checkbox' onclick='checkAll(this)'>\n" +
+            "</th>\n" +
+       " <th>单据编号</th>\n" +
+      "  <th>客户转账列表编号</th>\n" +
+
+     "   <th>总额</th>\n" +
+      "  <th>创建日期</th>\n" +
+      "  <th>创建者</th>\n" +
+      "  <th>修改日期</th>\n" +
+       " <th>修改者</th>\n" +
+            "  <th>操作</th>\n" +
+       " </tr>";
+        return ss;
+    }
+        // 查询单个的
+        function queryRec() {
+            var uName=document.getElementById("box1").value;
+
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/findOneRec",
+                cache: false,
+                data: {
+                    collectionListId:uName
+
+
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+
+
+                    var tab = getTable();
+                    var str = "";
+                    for (var i = 0; i < data.length; i++) {
+                        var obj=data[i];
+                        var temp = "<tr>" +
+                            "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                            "<td>" + obj.collectionListId + "</td>\n" +
+                            "  <td>" + obj.transferId  + "</td>\n" +
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\" value='查看详情'> </td>" +
+                            "  <td>" + obj.collectionTotal + "</td>" +
+                            "   <td>" + obj.collectionCreatDate+ "</td>\n"+
+                            "   <td>" + obj.collectionCrtator+ "</td>\n"+
+                            "   <td>" + obj.collectionModifyDate+ "</td>\n"+
+                            "   <td>" + obj.collectionReviser+ "</td>\n"+
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\" value='修改' onclick='openupateaRec(this)'> </td>" +
+                            "<td><input type=\"button\" class='btn btn-warning btn-sm' data-target='' data-toggle='modal' name=\"deleteStu\" value='删除' onclick='deleteRec(this)'> </td>" +
+                            "  </tr>";
+
+
+                        if (str.length== 0) {
+                            str = temp;
+                        } else {
+                            str = str + temp;
+                        }
+                        document.getElementById("myTable").innerHTML = tab + str;
+                    }
+                },
+                error: function (req, info, e) {
+
+                    alert("失败")
+                }
+            };
+            $.ajax(d);
+        }
+    //查询全部的
+    function queryAllRec() {
+
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/findAllRec",
+            cache: false,
+            data: {
+
+
+
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+
+                var tab = getTable();
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    var obj=data[i];
+                    var temp = " <tr>" +
+                        "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                        "   <td>" + obj.collectionListId + "</td>\n" +
+                        "  <td>" + obj.transferId  + "</td>\n" +
+
+                        "  <td>" + obj.collectionTotal + "</td>" +
+                        "   <td>" + obj.collectionCreatDate+ "</td>\n"+
+                        "   <td>" + obj.collectionCrtator+ "</td>\n"+
+                        "   <td>" + obj.collectionModifyDate+ "</td>\n"+
+                        "   <td>" + obj.collectionReviser+ "</td>\n"+
+                        "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\" value='查看详情'>&nbsp;&nbsp;" +
+                        "<input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\"value='修改' onclick='openupateaRec(this)'> &nbsp;&nbsp;" +
+                        "<input type=\"button\" class='btn btn-warning btn-sm' data-target='' data-toggle='modal' name=\"deleteStu\" value='删除' onclick='deleteRec(this)'> </td>" +
+
+                        "  </tr>";
+
+
+                    if (str.length== 0) {
+                        str = temp;
+                    } else {
+                        str = str + temp;
+                    }
+                    document.getElementById("myTable").innerHTML = tab + str;
+                }
+            },
+            error: function (req, info, e) {
+
+                alert("失败")
+            }
+        };
+        $.ajax(d);
+    }
+
+
+        function openupateaRec(obj)
+        {
+            var orderId=obj.parentNode.parentNode
+            var ordChildren=orderId.children
+            var id=ordChildren[1].innerHTML
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/findOpePaymentId",
+                cache: false,
+                data: {
+                    collectionListId : id
+
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+                    var obj=data[0];
+                    document.getElementById("colListId").value=id
+                    document.getElementById("traferId").value=obj.transferId
+                    document.getElementById("colTotal").value=obj.collectionTotal
+                    document.getElementById("colCreatDate").value=obj.collectionCreatDate
+                    document.getElementById("colCrtator").value=obj.collectionCrtator
+                    document.getElementById("colModifyDate").value=obj.collectionModifyDate
+                    document.getElementById("colReviser").value=obj.collectionReviser
+                    document.getElementById("colDelet").value=obj.collectionDelet
+
+                },
+                error: function (req, info, e) {
+                    alert("失败");
+
+                }
+            };
+            $.ajax(d);
+        }
+
+
+
+
+        function UpdateRec() {
+            var  collectionListId= document.getElementById("colListId").value;
+            var  transferId= document.getElementById("traferId").value;
+            var  collectionTotal = document.getElementById("colTotal").value;
+            var   collectionCreatDate= document.getElementById("colCreatDate").value;
+            var   collectionCrtator= document.getElementById("colCrtator").value;
+            var   collectionModifyDate= document.getElementById("colModifyDate").value;
+            var   collectionReviser = document.getElementById("colReviser").value;
+            var  collectionDelet= document.getElementById("colDelet").value;
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/UpdateRec",
+                cache: false,
+                data: {
+                    collectionListId:collectionListId,
+                    transferId:transferId,
+                    collectionTotal:collectionTotal,
+                    collectionCreatDate:collectionCreatDate,
+                    collectionCrtator: collectionCrtator,
+                    collectionModifyDate:collectionModifyDate,
+                    collectionReviser: collectionReviser,
+                    collectionDelet:collectionDelet
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+
+                    alert("修改成功")
+                },
+                error: function (req, info, e) {
+                    alert(e);
+
+                }
+            };
+            $.ajax(d);
+
+        }
+
+
+
+      function  deleteRec(obj){
+          var orderId=obj.parentNode.parentNode
+          var ordChildren=orderId.children
+          var id=ordChildren[1].innerHTML
+          var  collectionDelet= 0;
+          var d = {
+              type: "get",
+              url: "http://localhost:8080/DeleteRec",
+              cache: false,
+              data: {
+                  collectionListId : id,
+                  collectionDelet:collectionDelet
+
+
+
+              },
+              contentType: "application/json",
+              success: function (data) {
+                  queryAllRec();
+
+              },
+              error: function (req, info, e) {
+                  alert("失败");
+
+              }
+          };
+          $.ajax(d);
+
+        }
+
+
+
+
+
+        function  addRec(){
+            var  collectionListId = document.getElementById("ListId").value;
+            var  transferId= document.getElementById("traferIda").value;
+            var  collectionTotal = document.getElementById("colTotala").value;
+            var   collectionCreatDate= document.getElementById("colCreatDatea").value;
+            var   collectionCrtator= document.getElementById("colCrtatora").value;
+            var   collectionModifyDate= document.getElementById("colModifyDatea").value;
+            var   collectionReviser = document.getElementById("colRevisera").value;
+            var  collectionDelet= document.getElementById("colDeleta").value;
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/addRec",
+                cache: false,
+                data: {
+                    collectionListId:collectionListId,
+                    transferId:transferId,
+                    collectionTotal:collectionTotal,
+                    collectionCreatDate:collectionCreatDate,
+                    collectionCrtator: collectionCrtator,
+                    collectionModifyDate:collectionModifyDate,
+                    collectionReviser: collectionReviser,
+                    collectionDelet:collectionDelet
+
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+                    alert("提交成功");
+                },
+                error: function (req, info, e) {
+                    alert("失败");
+
+                }
+            };
+            $.ajax(d);
+
+        }
+
+
+
+
+    </script>
+
+
+</head>
+<body onload="queryAllRec()">
+
+<div class="col-lg-8" style="width: 80%">
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search for..." Id="box1" >
+        <span class="input-group-btn">
+        <button style="margin-right:20px" class="btn btn-default" type="button" onclick="queryRec()">查询</button>
+            <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#myModal">
+        新增
+    </button>
+      </span>
+    </div>
+    <!-- 新增模态框 -->
+
+</div>
+<!-- 主页面表单-->
+<table class="table table-hover" id="myTable" style="text-align: left"  >
+
+
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <table border="1">
+                    <tr>
+                        <th>单据编号</th>
+                        <th><input type="text" id="ListId" value="SKD-yyyyMMdd-xxxxx"></th>
+                    </tr>
+                    <tr>
+                        <th>客户转账列表编号</th>
+                        <th><input type="text" id="traferIda"></th>
+                    </tr>
+                    <tr>
+                        <th>总额</th>
+                        <th><input type="text" id="colTotala"></th>
+                    </tr>
+                    <tr>
+                        <th>创建日期</th>
+                        <th><input type="text" id="colCreatDatea"></th>
+                    </tr>
+                    <tr>
+                        <th>创建者</th>
+                        <th><input type="text" id="colCrtatora"></th>
+                    </tr>
+                    <tr>
+                        <th>修改日期</th>
+                        <th><input type="text" id="colModifyDatea"></th>
+                    </tr>
+                    <tr>
+                        <th>修改者</th>
+                        <th><input type="text" id="colRevisera"></th>
+                    </tr>
+                    <tr>
+                        <th>物理删除标志</th>
+                        <th><input type="text" value="1" id="colDeleta"></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="addRec()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 修改模态框 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel1">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <table border="1">
+                    <tr>
+                        <th>单据编号</th>
+                        <th><input type="text" id="colListId"></th>
+                    </tr>
+                    <tr>
+                        <th>客户转账列表编号</th>
+                        <th><input type="text" id="traferId"></th>
+                    </tr>
+                    <tr>
+                        <th>总额</th>
+                        <th><input type="text" id="colTotal"></th>
+                    </tr>
+                    <tr>
+                        <th>创建日期</th>
+                        <th><input type="text" id="colCreatDate"></th>
+                    </tr>
+                    <tr>
+                        <th>创建者</th>
+                        <th><input type="text" id="colCrtator"></th>
+                    </tr>
+                    <tr>
+                        <th>修改日期</th>
+                        <th><input type="text" id="colModifyDate"></th>
+                    </tr>
+                    <tr>
+                        <th>修改者</th>
+                        <th><input type="text" id="colReviser"></th>
+                    </tr>
+                    <tr>
+                        <th>物理删除标志</th>
+                        <th><input type="text" id="colDelet"></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="UpdateRec()">提交更改</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

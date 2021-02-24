@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>商品表</title>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap.css">
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap-theme.css">
+    <script type="text/javascript" src="http://localhost:8080/js/jquery.table2excel.js"></script>
+    <script src="http://localhost:8080/js/jquery-1.11.0.min.js" type="text/javascript" charset="utf-8"></script>
+    <link type="text/css" rel="stylesheet" href="http://localhost:8080/css/normalize.css">
+    <link type="text/css" rel="stylesheet" href="http://localhost:8080/css/style.css">
+</head>
+
+<style>
+
+
+
+    table {
+        border-collapse: collapse;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    table td, table th {
+        border: 1px solid #cad9ea;
+        color: #666;
+        height: 30px;
+    }
+
+    table thead th {
+        background-color: #CCE8EB;
+        width: 100px;
+    }
+
+    table tr:nth-child(odd) {
+        background: #fff;
+    }
+
+    table tr:nth-child(even) {
+        background: #F5FAFA;
+    }
+
+
+</style>
+
+
+
+
+
+<script>
+
+
+    function get() {
+
+        $("#myTable").table2excel({
+            exclude: ".noExl",
+            name: "Excel Document Name",
+            filename: "商品信息表",
+            exclude_img: true,
+            exclude_links: true,
+            exclude_inputs: true
+        });
+
+
+    }
+
+    function queryGood() {
+
+
+
+        var uName = document.getElementById("OperatorID").value;
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/ProductName",
+            cache: false,
+            data: {
+                ProductName  : uName
+
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+                // alert(data[0])
+                var tab = getGoodsTable();
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    var obj=data[i];
+                    var temp =   " <tr>" +
+                        "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                        "  <td>" + obj.waregoodsId  + "</td>\n"+
+                        "  <td>" + obj.productName  + "</td>\n" +
+                        "  <td>" + obj.productModel + "</td>" +
+                        "   <td>" + obj.productNumbe+ "</td>\n"+
+                        "   <td>" + obj.productPrice+ "</td>\n"+
+                        "   <td>" + obj.totalMoney+ "</td>\n"+
+                        "   <td>" + obj.waregoodsRemarks+ "</td>\n"+
+                        "   <td>" + obj.creatDate+ "</td>\n"+
+                        "   <td>" + obj.creatUser+ "</td>\n" +
+                        "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\"value='修改'onclick=' openupdate(this)'> </td>"+
+                        "  </tr>";
+
+                    if (str.length == 0) {
+                        str = temp;
+                    } else {
+                        str = str + temp;
+                    }
+                    document.getElementById("myTable").innerHTML = tab + str;
+                }
+            },
+            error: function (req, info, e) {
+                alert(e);
+
+            }
+        };
+        $.ajax(d);
+    }
+
+
+    function queryAllGoods(obj) {
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/ProductId",
+            cache: false,
+            data: {
+                ProductId:6
+
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+
+                var tab = getGoodsTable();
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    var obj=data[i];
+                    var temp =  " <tr>" +
+                        "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                        "  <td>" + obj.productName  + "</td>\n" +
+                        "  <td>" + obj.productModel + "</td>" +
+                        "   <td>" + obj.productNumbe+ "</td>\n"+
+                        "   <td>" + obj.productPrice+ "</td>\n"+
+                        "   <td>" + obj.totalMoney+ "</td>\n"+
+                        "   <td>" + obj.waregoodsRemarks+ "</td>\n"+
+                        "   <td>" + obj.creatDate+ "</td>\n"+
+                        "   <td>" + obj.creatUser+ "</td>\n" +
+                        "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\"value='修改'onclick=' openupdate(this)'> </td>"+
+                        "  </tr>";
+
+
+                    if (str.length== 0) {
+                        str = temp;
+                    } else {
+                        str = str + temp;
+                    }
+                    document.getElementById("myTable").innerHTML = tab + str;
+                }
+            },
+            error: function (req, info, e) {
+
+                alert("失败")
+            }
+        };
+        $.ajax(d);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function openupdate(obj)
+    {
+        var orderId=obj.parentNode.parentNode
+        var ordChildren=orderId.children
+        var id=ordChildren[1].innerHTML
+        var RowIDs= obj;
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/WaregoodsId",
+            cache: false,
+            data: {
+                WaregoodsId : id
+
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+                var obj=data[0];
+                document.getElementById("ProductNames").value= obj.productName
+                document.getElementById("ProductModels").value=obj.productModel
+                document.getElementById("ProductNumbes").value= obj.productNumbe
+                document.getElementById("ProductPrices").value=obj.productPrice
+                // alert(SWarehouseID)
+                document.getElementById("TotalMoneys").value=obj.totalMoney
+                document.getElementById("WaregoodsRemarkss").value=obj.waregoodsRemarks
+                document.getElementById("CreatDates").value= obj.creatDate
+                document.getElementById("CreatUsers").value= obj.creatUser
+
+
+            },
+            error: function (req, info, e) {
+                alert("失败");
+
+            }
+        };
+        $.ajax(d);
+    }
+
+
+
+
+
+
+
+
+
+    function SaveSort() {
+        var  SproductsFid= document.getElementById("productsFid").value;
+        var  Sproductsname= document.getElementById("productsname").value;
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/SaveSort",
+            cache: false,
+            data: {
+                ProductFasort:SproductsFid,
+                ProductName: Sproductsname
+
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+                alert("提交成功")
+            },
+            error: function (req, info, e) {
+                alert("提交成功");
+
+            }
+        };
+        $.ajax(d);
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function SaveGood() {
+        var  SProductName= document.getElementById("ProductName").value;
+        var  SProductModel= document.getElementById("ProductModel").value;
+        var  SProductNumbe = document.getElementById("ProductNumbe").value;
+        var   SProductPrice= document.getElementById("ProductPrice").value;
+        // alert(SWarehouseID)
+        var   STotalMoney= document.getElementById("TotalMoney").value;
+        var   SWaregoodsRemarks= document.getElementById("WaregoodsRemarks").value;
+        var  SCreatDate= document.getElementById("CreatDate").value;
+        var  SCreatUser = document.getElementById("CreatUser").value;
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/SaveGood",
+            cache: false,
+            data: {
+                ProductId:6,
+                ProductName:SProductName,
+                ProductModel:SProductModel,
+                ProductNumbe:SProductNumbe,
+                ProductPrice:SProductPrice,
+                TotalMoney: STotalMoney,
+                WaregoodsRemarks :SWaregoodsRemarks,
+                CreatDate: SCreatDate,
+                CreatUser:SCreatUser
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+                alert("提交成功")
+            },
+            error: function (req, info, e) {
+                alert("提交成功");
+
+            }
+        };
+        $.ajax(d);
+
+    }
+
+
+
+
+
+    function Updategood() {
+        //var SProuductID=document.getElementById("ProuductID").value;
+        var  SOperatorIDs= document.getElementById("OperatorIDss").value;
+        //alert(SOperatorIDs)
+        var  SOrderId= document.getElementById("OrderIds").value;
+        //alert( SOrderId)
+        var  SCusId = document.getElementById("CusIds").value;
+        //alert(SCusId)
+        var   SWarehouseID= document.getElementById("WarehouseIDs").value;
+        //alert(SWarehouseID)
+        var   SListRemarks= document.getElementById("ListRemarkss").value;
+        //alert( SListRemarks)
+        var   SOrderTotal= document.getElementById("OrderTotals").value;
+        //alert( SOrderTotal)
+        var   SOrderState = document.getElementById("AppRovalStates").value;
+        //alert(SOrderState)
+        var  SCreatDate= document.getElementById("CreatDates").value;
+        //alert( SCreatDate)
+        var  SCreatUser = document.getElementById("CreatUsers").value;
+        //alert(SCreatUser)
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/UpdateOpe",
+            cache: false,
+            data: {
+                OperatorID:SOperatorIDs,
+                OrderId:SOrderId,
+                CusId:SCusId,
+                ProuductID:SWarehouseID,
+                ListRemarks: SListRemarks,
+                OrderState :SOrderState,
+                OrderTotal:SOrderTotal,
+                CreatDate: SCreatDate,
+                CreatUser:SCreatUser
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+                alert("提交成功")
+            },
+            error: function (req, info, e) {
+                alert(e);
+
+            }
+        };
+        $.ajax(d);
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function getGoodsTable() {
+        var ss="<tr>\n" +
+            "<th>复选框</th>\n"+
+            "<th>名称</th>\n" +
+            "<th>型号</th>\n" +
+            "<th>数量</th>\n" +
+            "<th>单价</th>\n" +
+            "<th>金额</th>\n"+
+            "<th>备注</th>\n"+
+            "<th>创建日期</th>\n"+
+            "<th>创建者</th>\n"+
+            "<th>操作</th>\n"+
+            "</tr>";
+        return ss;
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function deleteOpe() {
+        var m = document.getElementsByName("box");
+        var str = ""
+        var sum=0;
+        for (var i = 0; i < m.length; i++) {
+            var n = m[i];
+
+            if (n.checked) {
+                sum++
+            }
+        }
+        if(sum>1)
+        {
+            alert("不可多选单选框")
+        }
+        else {
+            for (var i = 0; i < m.length; i++) {
+                var n = m[i];
+
+                if (n.checked) {
+                    i--;
+                    var child = n.parentNode.parentNode
+                    var tid = child.children
+                    str = str + "," + tid[1].innerHTML
+                    child.parentNode.removeChild(child)
+
+
+                }
+
+
+            }
+        }
+        var myUrl = "http://localhost:8080/DelGood";
+        var  id=tid[1].innerHTML
+        var d = {
+            type: "get",
+            url: myUrl,
+            cache: false,
+            data: {
+                WaregoodsId:id,
+                phoneNo: 123
+            },
+            dateType: "json",
+            success: function (data) {
+
+            },
+            error:function (req,info,e) {
+                alert(e);
+
+            }
+        };
+        $.ajax(d);
+    }
+
+
+    function queryAllOpe() {
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/ProductFasort",
+            cache: false,
+            data: {
+                ProductFasort:1
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    var obj = data[i];
+                    var temp =
+                        "<li id='obj.productId'> " + "<a class=\"ti\" href=\"#\">"+obj.productName+"</a>"+
+                        "<ul class='prosmore hide'>"+"<span> " + "<a >"+obj.productName+"</a>"+
+                        "</span>\n"+
+                        "</ul>" +
+                        "</li>\n"
+
+                    if (str.length == 0) {
+                        str = temp;
+                    } else {
+                        str = str + temp;
+                    }
+                    document.getElementById("proinfo").innerHTML = str
+                    alert(str)
+                }
+            },
+            error: function (req, info, e) {
+
+                alert("失败")
+            }
+        };
+        $.ajax(d);
+    }
+
+
+
+    function queryAllsorts(obj) {
+
+        var  objli=obj
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/ProductProductId",
+            cache: false,
+            data: {
+                ProductId :2
+            },
+            contentType: "application/json",
+            success: function (data) {
+                var str = "";
+
+                for (var i = 0; i < data.length; i++) {
+                    var obj = data[i];
+                    var temp = "<span> " + "<a class=\"ti\" onclick='queryAllGoods(this)' value='"+obj.productId+"' >"+obj.productName+"</a>"+
+                        "</span>\n"
+
+
+
+                    if (str.length == 0) {
+                        str = temp;
+                    } else {
+                        str = str + temp;
+                    }
+                    document.getElementById("pp").innerHTML=str
+                }
+            },
+            error: function (req, info, e) {
+
+                alert("失败")
+            }
+        };
+        $.ajax(d);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    (function () {
+        var $subblock = $(".subpage"), $head = $subblock.find('h2'), $ul = $("#proinfo"), $lis = $ul.find("li"),
+            inter = false;
+
+        $head.click(function (e) {
+            e.stopPropagation();
+            if (!inter) {
+                $ul.show();
+            } else {
+                $ul.hide();
+            }
+            inter = !inter;
+        });
+
+        $ul.click(function (event) {
+            event.stopPropagation();
+        });
+
+        $(document).click(function () {
+            $ul.hide();
+            inter = !inter;
+        });
+
+        $lis.hover(function () {
+            if (!$(this).hasClass('nochild')) {
+                $(this).addClass("prosahover");
+                $(this).find(".prosmore").removeClass('hide');
+            }
+        }, function () {
+            if (!$(this).hasClass('nochild')) {
+                if ($(this).hasClass("prosahover")) {
+                    $(this).removeClass("prosahover");
+                }
+                $(this).find(".prosmore").addClass('hide');
+            }
+        });
+
+    })();
+
+
+
+
+</script>
+
+
+
+<body onload="queryAllsorts()">
+<table>
+    <tr>
+        <td style="width: 500px ;text-align: center">
+
+            <ul class="pros subpage">
+                <h2>全部团购分类</h2>
+                <ul class="prosul clearfix" id="proinfo">
+                    <li>
+                        <a class="ti" href="#">厨房灯</a>
+                        <div class="prosmore hide"  id="pp">
+
+
+                        </div>
+
+                    </li>
+
+
+                    <li class="food">
+                        <i>></i>
+                        <a class="ti" href="#">室内</a>
+                        <div class="prosmore hide">
+                            <span><em><a href="#">台灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">壁灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">吸顶灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">落地灯</a></em></span>
+                        </div>
+                    </li>
+                    <li class="enjoy">
+                        <i>></i>
+                        <a class="ti" href="#">室外</a>
+                        <div class="prosmore hide">
+                            <span><em><a href="#">景观灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">道路灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">草坪灯</a></em></span>
+                            <span><em><a href="#">庭院灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">地埋灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">护栏灯</a></em></span>
+
+                        </div>
+                    </li>
+
+
+
+
+
+
+
+
+                </ul>
+
+
+
+
+
+        </td>
+        <td style="width:1100px">
+            <div class="col-lg-8" style="width: 80%">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search for..." Id="OperatorID" >
+                    <span class="input-group-btn">
+        <button style="margin-right:10px"  class="btn btn-default" type="button" onclick="queryGood()">Go!</button>
+                         <button style="margin-right:10px"  class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">添加商品</button>
+                <button style="margin-right:10px" class="btn btn-warning btn-sm"   onclick="deleteOpe()">删除</button>
+                <button style="margin-right:10px" class="btn btn-warning btn-sm"  onclick="get()">导出数据</button>
+                <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModals">添加分类</button>
+      </span>
+                </div>
+                <table class="table table-hover " id="myTable" style="width: 100%"   >
+
+
+
+                </table>
+
+
+        </td>
+    </tr>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 按钮触发模态框 -->
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">商品管理</h4>
+            </div>
+            <div class="modal-body">
+                <h4>添加商品</h4>
+
+                <table class="table table-hover">
+
+
+                    <tr>
+                        <th>名称</th>
+                        <th>型号</th>
+                        <th>数量</th>
+                        <th>单价</th>
+                        <th>金额</th>
+                        <th>备注</th>
+                        <th>创建日期</th>
+                        <th>创建者</th>
+                    </tr>
+
+                    <tr>
+                    <tr>
+                        <td><input type="text"style="height:30px;width:60px" id="ProductName"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="ProductModel"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="ProductNumbe"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="ProductPrice"></td>
+                        <td><input type="text"style="height:30px;width:60px" id="TotalMoney"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="WaregoodsRemarks"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="CreatDate"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="CreatUser"></td>
+                    </tr>
+
+
+                    </tr>
+
+
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary"ONCLICK="SaveGood()"data-dismiss="modal">提交保存</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel1">商品修改</h4>
+            </div>
+            <div class="modal-body">
+
+
+                <h4>修改商品</h4>
+
+                <table class="table table-hover">
+
+
+                    <tr>
+                        <th>名称</th>
+                        <th>型号</th>
+                        <th>数量</th>
+                        <th>单价</th>
+                        <th>金额</th>
+                        <th>备注</th>
+                        <th>创建日期</th>
+                        <th>创建者</th>
+                    </tr>
+
+                    <tr>
+                        <td><input type="text"style="height:30px;width:60px" id="ProductNames"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="ProductModels"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="ProductNumbes"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="ProductPrices"></td>
+                        <td><input type="text"style="height:30px;width:60px" id="TotalMoneys"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="WaregoodsRemarkss"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="CreatDates"></td>
+                        <td><input type="text"style="height:31px;width:60px"id="CreatUsers"></td>
+
+
+                    </tr>
+
+
+                </table>
+
+
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <button type="button" class="btn btn-primary" onclick="Updategood()"data-dismiss="modal">提交更改</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="myModalss" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabels">添加商品</h4>
+            </div>
+        </div>
+        <div class="modal-body">
+            <h4>添加商品</h4>
+
+            <table class="table table-hover">
+
+
+
+
+            </table>
+
+
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            <button type="button" class="btn btn-primary"ONCLICK="SaveOpe()"data-dismiss="modal">提交保存</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+
+
+
+
+
+<div class="modal fade" id="myModals" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabelss">商品分类</h4>
+            </div>
+            <div class="modal-body">
+
+
+                <table class="table table-hover" id="goodsTables">
+
+                    <tr>
+                        <th>商品分类</th>
+                        <th>商品名称</th>
+                    </tr>
+
+                    <tr>
+                        <td><input type="text"style="height:30px;width:150px" id="productsFid" value="1"></td>
+                        <td><input type="text"style="height:31px;width:150px"id="productsname"></td>
+                    </tr>
+
+
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary"ONCLICK="SaveSort()"data-dismiss="modal">提交保存</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+<script>
+
+    (function () {
+        var $subblock = $(".subpage"), $head = $subblock.find('h2'), $ul = $("#proinfo"), $lis = $ul.find("li"),
+            inter = false;
+
+        $head.click(function (e) {
+            e.stopPropagation();
+            if (!inter) {
+                $ul.show();
+            } else {
+                $ul.hide();
+            }
+            inter = !inter;
+        });
+
+        $ul.click(function (event) {
+            event.stopPropagation();
+        });
+
+        $(document).click(function () {
+            $ul.hide();
+            inter = !inter;
+        });
+
+        $lis.hover(function () {
+            if (!$(this).hasClass('nochild')) {
+                $(this).addClass("prosahover");
+                $(this).find(".prosmore").removeClass('hide');
+            }
+        }, function () {
+            if (!$(this).hasClass('nochild')) {
+                if ($(this).hasClass("prosahover")) {
+                    $(this).removeClass("prosahover");
+                }
+                $(this).find(".prosmore").addClass('hide');
+            }
+        });
+
+    })();
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="../../static/js/jquery-3.4.1.js"></script>
+    <link type="text/css" rel="stylesheet" href="../../static/css/login.css">
+    <link type="text/css" rel="stylesheet" href="../../static/css/style.css">
+</head>
+<body>
+<div class="form-box">
+    <div class="link">
+        <span class="ring"></span>
+        <span class="ring"></span>
+        <span class="ring"></span>
+        <span class="ring"></span>
+        <span class="ring"></span>
+        <div>
+            <form method="post" action="#">
+                <span class="icon-1"></span><input type="text" id="user"><br />
+                <span class="icon-2"></span><input type="password" id="pwd"><br />
+                <input type="button" id="login" value="登录" onclick="loginBtn()">
+                <input type="button" id="register" value="注册" onclick="regBtn()">
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function regBtn(){
+        window.open('register','_self','height=500 width=500 top=300 left=400');
+    }
+    function loginBtn(){
+        var user = document.getElementById("user").value;
+        var pwd = document.getElementById("pwd").value;
+        var queryData = {
+            type:"post",
+            url:"/queryUser",
+            cache:false,
+            data:{
+                stuName:user,
+                stuPwd:pwd
+            },
+            dataType:"json",
+            success:function(data){
+                if(data != null){
+                    var id = data.stuId;
+                    window.open('index?id='+id,'_self','height=500 width=500 top=300 left=400');
+                }else{
+                    alert("用户不存在!");
+                }
+            },
+            error:function(){
+                alert("查询失败");
+            }
+        }
+        $.ajax(queryData);
+    }
+
+    function openPage(sid) {
+        var idData = {
+            type:"post",
+            url:"/index",
+            cache:false,
+            data:{
+                stuId:sid
+            },
+            dataType:"json",
+            success:function(data){
+                console.log(data)
+                //window.open('index','_self','height=500 width=500 top=300 left=400');
+            },
+            error:function(){
+                alert("失败");
+            }
+        }
+        $.ajax(idData);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+package com.example.demo.service;
+
+import com.example.demo.dao.StudentDao;
+import com.example.demo.entity.Student;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
+
+@Service
+public class StudentService {
+    @Autowired
+    StudentDao dao;
+
+    @Transactional
+    public void addStudent(Student student){
+        dao.save(student);
+    }
+
+    @Transactional
+    public List<Student> queryUserByName(String stuName){
+        List<Student> stu =dao.queryStudentByStuName(stuName);
+        return stu;
+    }
+
+    @Transactional
+    public void delStudent(int stuId){
+        dao.deleteById(stuId);
+    }
+
+    public Student queryUser(String stuName,String stuPwd){
+        return dao.queryStudentByStuNameAndAndStuPwd(stuName,stuPwd);
+    }
+
+    public Student queryStudent(int stuId){
+        return dao.queryStudentByStuId(stuId);
+    }
+
+    public List<Student> pagaCourse(int page,int size){
+        Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.ASC,"stuId"));
+        Page<Student> pageList = dao.findAll(pageable);
+        return pageList.toList();
+
+    }
+}

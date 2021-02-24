@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>库存盘点</title>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery-3.4.1.js"></script>
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap.css">
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap-theme.css">
+    <script type="text/javascript" src="http://localhost:8080/js/bootstrap.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery.table2excel.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery.table2excel.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        table td, table th {
+            border: 1px solid #cad9ea;
+            color: #666;
+            height: 30px;
+        }
+
+        table thead th {
+            background-color: #CCE8EB;
+            width: 100px;
+        }
+
+        table tr:nth-child(odd) {
+            background: #fff;
+        }
+
+        table tr:nth-child(even) {
+            background: #F5FAFA;
+        }
+
+
+    </style>
+    <script>
+
+
+        //导出exal表
+        function openExal() {
+            $("#myTable").table2excel({
+                // 导出的Excel文档的名称
+                name: "Excel Document Name",
+                // Excel文件的名称
+                filename: "myExcelTable",
+                exclude_inputs: "YES"
+            });
+        }
+
+
+        //全选功能
+        function checkAll() {
+            var first = document.getElementById("selAll");
+            var str = first.checked;
+            var str1 = document.getElementsByName("box");
+            if (str) {
+                for (var i = 0; i < str1.length; i++) {
+                    var rid = str1[i];
+                    rid.checked = true;
+                }
+            } else {
+                for (var i = 0; i < str1.length; i++) {
+                    var rid = str1[i];
+                    rid.checked = false;
+                }
+            }
+        }
+
+
+        // 表头
+        function getTable() {
+            var ss = "<tr>\n" +
+                "<th>\n" +
+                "<input type='checkbox' onclick='checkAll()' id='selAll'>\n" +
+                "</th>\n" +
+                " <th>清单编号</th>\n" +
+                " <th>盘点人</th>\n" +
+                "  <th>创建日期</th>\n" +
+                "  <th>创建者</th>\n" +
+                "  <th>查看详情</th>\n" +
+                "   <th>导出</th>\n" +
+                "   <th>修改</th>\n" +
+                "   <th>删除</th>\n" +
+                " </tr>";
+            return ss;
+        }
+
+
+        // 查询单个的
+        function queryInventory() {
+            var uName = document.getElementById("box1").value;
+
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/findOneInv",
+                cache: false,
+                data: {
+                    prolistId: uName
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+
+
+                    var tab = getTable();
+                    var str = "";
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+                        var temp = "<tr>" +
+                            "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                            "<td>" + obj.prolistId + "</td>\n" +
+                            "  <td>" + obj.stockCheck + "</td>\n" +
+                            "  <td>" + obj.stockCreatDate + "</td>" +
+                            "   <td>" + obj.stockCrtator + "</td>\n" +
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal' data-toggle='modal' name=\"updataStu\" value='查看详情' onclick='queryPro(this)'> </td>" +
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='' data-toggle='modal' name=\"updataStu\" value='导出' onclick='openExalOneRow()'> </td>" +
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\" value='修改' onclick='openupateaPro(this)'> </td>" +
+                            "<td><input type=\"button\" class='btn btn-warning btn-sm' data-target='' data-toggle='modal' name=\"deleteStu\" value='删除' onclick='deletePro(this)'> </td>" +
+                            "  </tr>";
+
+
+                        if (str.length == 0) {
+                            str = temp;
+                        } else {
+                            str = str + temp;
+                        }
+                        document.getElementById("myTable").innerHTML = tab + str;
+                    }
+                },
+                error: function (req, info, e) {
+
+                    alert("失败")
+                }
+            };
+            $.ajax(d);
+        }
+
+
+        //查询全部的
+        function queryAllInventory() {
+
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/findAllInv",
+                cache: false,
+                data: {},
+                contentType: "application/json",
+                success: function (data) {
+
+
+                    var tab = getTable();
+                    var str = "";
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+                        var temp = "<tr>" +
+                            "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                            "<td>" + obj.prolistId + "</td>\n" +
+                            "  <td>" + obj.stockCheck + "</td>\n" +
+                            "  <td>" + obj.stockCreatDate + "</td>" +
+                            "   <td>" + obj.stockCrtator + "</td>\n" +
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal' data-toggle='modal' name=\"updataStu\" value='查看详情' onclick='queryPro(this)'> </td>" +
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='' data-toggle='modal' name=\"updataStu\" value='导出' onclick='openExalOneRow()'> </td>" +
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\" value='修改' onclick='openupateaPro(this)'> </td>" +
+                            "<td><input type=\"button\" class='btn btn-warning btn-sm' data-target='' data-toggle='modal' name=\"deleteStu\" value='删除' onclick='deletePro(this)'> </td>" +
+                            "  </tr>";
+
+
+                        if (str.length == 0) {
+                            str = temp;
+                        } else {
+                            str = str + temp;
+                        }
+                        document.getElementById("myTable").innerHTML = tab + str;
+                    }
+                },
+                error: function (req, info, e) {
+
+                    alert("失败");
+                }
+            };
+            $.ajax(d);
+        }
+
+
+        function openupateaPro(obj) {
+            var orderId = obj.parentNode.parentNode
+            var ordChildren = orderId.children
+            var id = ordChildren[1].innerHTML
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/findOpeProlistId",
+                cache: false,
+                data: {
+                    prolistId: id
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+                    var obj = data[0];
+                    document.getElementById("prolistId").value = id
+                    document.getElementById("stockCheck").value = obj.stockCheck
+                    document.getElementById("stockCreatDate").value = obj.stockCreatDate
+                    document.getElementById("stockCrtator").value = obj.stockCrtator
+                    document.getElementById("stockModifyDate").value = obj.stockModifyDate
+                    document.getElementById("stockReviser").value = obj.stockReviser
+                    document.getElementById("deletState").value = obj.deletState
+                },
+                error: function (req, info, e) {
+                    alert("失败");
+
+                }
+            };
+            $.ajax(d);
+        }
+
+
+        function UpdatePro() {
+            var prolistId = document.getElementById("prolistId").value
+            var stockCheck = document.getElementById("stockCheck").value
+            var stockCreatDate = document.getElementById("stockCreatDate").value
+            var stockCrtator = document.getElementById("stockCrtator").value
+            var stockModifyDate = document.getElementById("stockModifyDate").value
+            var stockReviser = document.getElementById("stockReviser").value
+            var deletState = document.getElementById("deletState").value
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/UpdatePro",
+                cache: false,
+                data: {
+                    prolistId: prolistId,
+                    stockCheck: stockCheck,
+                    stockCreatDate: stockCreatDate,
+                    stockCrtator: stockCrtator,
+                    stockModifyDate: stockModifyDate,
+                    stockReviser: stockReviser,
+                    deletState: deletState
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+
+                    alert("修改成功")
+                },
+                error: function (req, info, e) {
+                    alert(e);
+
+                }
+            };
+            $.ajax(d);
+
+        }
+
+
+        function deletePro(obj) {
+            var orderId = obj.parentNode.parentNode
+            var ordChildren = orderId.children
+            var id = ordChildren[1].innerHTML
+            var deletState = 0;
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/DeletePro",
+                cache: false,
+                data: {
+                    prolistId: id,
+                    deletState: deletState
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+                    queryAllPro();
+
+                },
+                error: function (req, info, e) {
+                    alert("失败");
+
+                }
+            };
+            $.ajax(d);
+
+        }
+
+
+        function addPro() {
+            var prolistId = document.getElementById("prolistId").value;
+            var stockCheck = document.getElementById("stockCheck").value;
+            var stockCreatDate = document.getElementById("stockCreatDate").value;
+            var stockCrtator = document.getElementById("stockCrtator").value;
+            var stockModifyDate = document.getElementById("stockModifyDate").value;
+            var stockReviser = document.getElementById("stockReviser").value;
+            var deletState = document.getElementById("deletState").value;
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/addPro",
+                cache: false,
+                data: {
+                    prolistId: prolistId,
+                    stockCheck: stockCheck,
+                    stockCreatDate: stockCreatDate,
+                    stockCrtator: stockCrtator,
+                    stockModifyDate: stockModifyDate,
+                    stockReviser: stockReviser,
+                    deletState: deletState
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+                    alert("提交成功");
+                },
+                error: function (req, info, e) {
+                    alert("失败");
+
+                }
+            };
+            $.ajax(d);
+
+        }
+
+
+        // 查看详情表头
+        function Table() {
+            var ss = "<tr>\n" +
+                " <th>商品名称</th>\n" +
+                " <th>型号</th>\n" +
+                "  <th>库存数量</th>\n" +
+                "  <th>库存均价</th>\n" +
+                "  <th>批次</th>\n" +
+                "   <th>批号</th>\n" +
+                "   <th>出厂日期</th>\n" +
+                "   <th>操作</th>\n" +
+                " </tr>";
+            return ss;
+        }
+
+
+        //库存商品查询
+        function queryPro(obr) {
+            var orderId = obr.parentNode.parentNode;
+            var ordChildren = orderId.children;
+            var id = ordChildren[1].innerHTML;
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/findOnePro",
+                cache: false,
+                data: {
+                    prolistID: id
+                },
+                contentType: "application/json",
+                success: function (data) {
+
+                    var tab = Table();
+                    var str = "";
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+                        var temp = "<tr>" +
+                            "<td style='display: none' class='intro'>" + obj.rowId + "</td>\n" +
+                            "  <td style='display: none' class='intro'>" + id + "</td>\n" +
+                            "  <td class='intro'>" + obj.productName + "</td>" +
+                            "   <td class='intro'>" + obj.productModel + "</td>\n" +
+                            "<td class='intro'>" + obj.stockNumber + "</td>\n" +
+                            "  <td class='intro'>" + obj.stockAvePrice + "</td>\n" +
+                            "  <td class='intro'>" + obj.stockBatch + "</td>" +
+                            "   <td class='intro'>" + obj.stockBatchNumb + "</td>\n" +
+                            "   <td style='width:100px;height:30px;'>" + obj.productDate + "</td>\n" +
+                            "   <td class='intro'>" + "<input type=button value='操作'>" + "</td>\n" +
+                            "  </tr>";
+
+
+                        if (str.length == 0) {
+                            str = temp;
+                        } else {
+                            str = str + temp;
+                        }
+                        document.getElementById("Table").innerHTML = tab + str;
+                    }
+                },
+                error: function (req, info, e) {
+
+                    alert("失败")
+                }
+            };
+            $.ajax(d);
+        }
+
+
+    </script>
+</head>
+<body onload="queryAllInventory()">
+<div>
+    <div class="col-lg-8" style="width: 80%">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for..." Id="box1">
+            <span class="input-group-btn">&nbsp;&nbsp;&nbsp;
+        <button  style="margin-right:20px" class="btn btn-default " type="button" onclick="queryInventory()">查询</button>
+       <button style="margin-right:20px" type="button" class="btn btn-primary " data-toggle="modal" data-target="#myModal1">
+                新增盘点表
+            </button>&nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-primary " data-toggle="modal" onclick="openExal()">
+                导出exal表
+            </button>
+            </span>
+        </div>
+    </div>
+
+
+    <!-- 查看详情模态框 -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                </div>
+                <div class="modal-body">
+                    <table border="1" id="Table">
+
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<!-- 主页面表单-->
+<table class="table table-hover" id="myTable" style="text-align: left">
+
+
+</table>
+
+
+<!-- 修改模态框 --><!-- 新增模态框 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel1">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <table border="1">
+                    <tr>
+                        <th>清单编号</th>
+                        <th><input type="text" id="prolistId"></th>
+                    </tr>
+                    <tr>
+                        <th>盘点人</th>
+                        <th><input type="text" id="stockCheck"></th>
+                    </tr>
+                    <tr>
+                        <th>创建日期</th>
+                        <th><input type="text" id="stockCreatDate"></th>
+                    </tr>
+                    <tr>
+                        <th>创建者</th>
+                        <th><input type="text" id="stockCrtator"></th>
+                    </tr>
+                    <tr>
+                        <th>修改日期</th>
+                        <th><input type="text" id="stockModifyDate"></th>
+                    </tr>
+                    <tr>
+                        <th>修改者</th>
+                        <th><input type="text" id="stockReviser"></th>
+                    </tr>
+                    <tr>
+                        <th>物理删除标志</th>
+                        <th><input type="text" id="deletState"></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="addPro()">添加保存</button>
+                <button type="button" class="btn btn-primary" onclick="UpdatePro()">提交更改</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
