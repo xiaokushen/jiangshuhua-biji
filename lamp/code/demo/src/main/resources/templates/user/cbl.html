@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>进货单</title>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery-1.11.0.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="http://localhost:8080/css/normalize.css">
+    <link type="text/css" rel="stylesheet" href="http://localhost:8080/css/style.css">
+</head>
+
+
+
+
+<body onload="queryAllsorts()">
+
+
+        <div id="nav">
+
+            <ul class="pros subpage">
+                <h2>全部团购分类</h2>
+                <ul class="prosul clearfix" id="proinfo">
+                    <li>
+                    <a class="ti" href="#">厨房灯</a>
+                    <div class="prosmore hide"  id="pp">
+
+
+                    </div>
+
+                    </li>
+
+
+                    <li class="food">
+                        <i>></i>
+                        <a class="ti" href="#">室内</a>
+                        <div class="prosmore hide">
+                            <span><em><a href="#">台灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">壁灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">吸顶灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">落地灯</a></em></span>
+                        </div>
+                    </li>
+                    <li class="enjoy">
+                        <i>></i>
+                        <a class="ti" href="#">室外</a>
+                        <div class="prosmore hide">
+                            <span><em><a href="#">景观灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">道路灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">草坪灯</a></em></span>
+                            <span><em><a href="#">庭院灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">地埋灯</a></em></span>
+                            <span><em class="morehot"><a class="morehot" href="#">护栏灯</a></em></span>
+
+                        </div>
+                    </li>
+
+
+
+
+
+
+
+
+                </ul>
+
+
+
+
+</div>
+    </div>
+
+
+
+    <script>
+
+    function queryAllOpe() {
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/ProductFasort",
+            cache: false,
+            data: {
+                ProductFasort:1
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    var obj = data[i];
+                    var temp =
+                        "<li id='obj.productId'> " + "<a class=\"ti\" href=\"#\">"+obj.productName+"</a>"+
+                        "<ul class='prosmore hide'>"+"<span> " + "<a >"+obj.productName+"</a>"+
+                        "</span>\n"+
+                        "</ul>" +
+                        "</li>\n"
+
+                    if (str.length == 0) {
+                        str = temp;
+                    } else {
+                        str = str + temp;
+                    }
+                    document.getElementById("proinfo").innerHTML = str
+                    alert(str)
+                }
+            },
+            error: function (req, info, e) {
+
+                alert("失败")
+            }
+        };
+        $.ajax(d);
+    }
+
+
+
+    function queryAllsorts(obj) {
+
+        var  objli=obj
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/ProductProductId",
+            cache: false,
+            data: {
+                ProductId :2
+            },
+            contentType: "application/json",
+            success: function (data) {
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    var obj = data[i];
+                    var temp = "<span> " + "<a class=\"ti\"  href=\"goods.html?6\">"+obj.productName+"</a>"+
+                        "</span>\n"
+
+
+
+                    if (str.length == 0) {
+                        str = temp;
+                    } else {
+                        str = str + temp;
+                    }
+                    document.getElementById("pp").innerHTML=str
+                }
+            },
+            error: function (req, info, e) {
+
+                alert("失败")
+            }
+        };
+        $.ajax(d);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    (function () {
+        var $subblock = $(".subpage"), $head = $subblock.find('h2'), $ul = $("#proinfo"), $lis = $ul.find("li"),
+            inter = false;
+
+        $head.click(function (e) {
+            e.stopPropagation();
+            if (!inter) {
+                $ul.show();
+            } else {
+                $ul.hide();
+            }
+            inter = !inter;
+        });
+
+        $ul.click(function (event) {
+            event.stopPropagation();
+        });
+
+        $(document).click(function () {
+            $ul.hide();
+            inter = !inter;
+        });
+
+        $lis.hover(function () {
+            if (!$(this).hasClass('nochild')) {
+                $(this).addClass("prosahover");
+                $(this).find(".prosmore").removeClass('hide');
+            }
+        }, function () {
+            if (!$(this).hasClass('nochild')) {
+                if ($(this).hasClass("prosahover")) {
+                    $(this).removeClass("prosahover");
+                }
+                $(this).find(".prosmore").addClass('hide');
+            }
+        });
+
+    })();
+</script>
+</body>
+</html>

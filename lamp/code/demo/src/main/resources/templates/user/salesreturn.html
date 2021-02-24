@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>进货退货单</title>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery-3.4.1.js"></script>
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap.css">
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap-theme.css">
+    <script type="text/javascript" src="http://localhost:8080/js/bootstrap.js"></script>
+
+</head>
+
+<style>
+    table {
+        border-collapse: collapse;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    table td, table th {
+        border: 1px solid #cad9ea;
+        color: #666;
+        height: 30px;
+    }
+
+    table thead th {
+        background-color: #CCE8EB;
+        width: 100px;
+    }
+
+    table tr:nth-child(odd) {
+        background: #fff;
+    }
+
+    table tr:nth-child(even) {
+        background: #F5FAFA;
+    }
+
+
+</style>
+<script>
+    function queryOpe() {
+
+        var uName = document.getElementById("OperatorID").value;
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/findSales",
+            cache: false,
+            data: {
+                OperatorID: uName
+
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+                // alert(data[0])
+                var tab = getTable();
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    var obj=data[i];
+                    var temp = " <tr>" +
+                        "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                        "   <td>" + obj.orderId + "</td>\n" +
+                        "  <td>" + obj.cusId  + "</td>\n" +
+                        "  <td>" + obj.warehouseID + "</td>" +
+                        "   <td>" + obj.operatorID+ "</td>\n"+
+                        "   <td>" + obj.prouductID+ "</td>\n"+
+                        "   <td>" + obj.listRemarks+ "</td>\n"+
+                        "   <td>" + obj.orderTotal+ "</td>\n"+
+                        "   <td>" + obj.orderState+ "</td>\n"+
+                        "   <td>" + obj.creatDate+ "</td>\n"+
+                        "   <td>" + obj.creatUser+ "</td>\n"+
+                        "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\"value='修改'onclick=' openupateaOpe(a)'> </td>"
+                        +
+                        "  </tr>";
+
+
+                    if (str.length == 0) {
+                        str = temp;
+                    } else {
+                        str = str + temp;
+                    }
+                    document.getElementById("myTable").innerHTML = tab + str;
+                }
+            },
+            error: function (req, info, e) {
+                alert(e);
+
+            }
+        };
+        $.ajax(d);
+    }
+
+
+    function queryAllOpe() {
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/findSaleAllOpe",
+            cache: false,
+            data: {
+
+
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+
+                var tab = getTable();
+                var str = "";
+                for (var i = 0; i < data.length; i++) {
+                    var obj=data[i];
+                    var temp = " <tr>" +
+                        "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                        "   <td>" + obj.orderId + "</td>\n" +
+                        "  <td>" + obj.cusId  + "</td>\n" +
+                        "  <td>" + obj.warehouseID + "</td>" +
+                        "   <td>" + obj.operatorID+ "</td>\n"+
+                        "   <td>" + obj.prouductID+ "</td>\n"+
+                        "   <td>" + obj.listRemarks+ "</td>\n"+
+                        "   <td>" + obj.orderTotal+ "</td>\n"+
+                        "   <td>" + obj.orderState+ "</td>\n"+
+                        "   <td>" + obj.creatDate+ "</td>\n"+
+                        "   <td>" + obj.creatUser+ "</td>\n"+
+                        "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\"value='修改'onclick=' openupateaOpe(this)'> </td>"
+                        +
+                        "  </tr>";
+
+
+                    if (str.length== 0) {
+                        str = temp;
+                    } else {
+                        str = str + temp;
+                    }
+                    document.getElementById("myTable").innerHTML = tab + str;
+                }
+            },
+            error: function (req, info, e) {
+
+                alert("失败")
+            }
+        };
+        $.ajax(d);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function openupateaOpe(obj)
+    {
+        var orderId=obj.parentNode.parentNode
+        var ordChildren=orderId.children
+        var id=ordChildren[1].innerHTML
+        var RowIDs= obj;
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/findOpeOrderId",
+            cache: false,
+            data: {
+                OrderId : id
+
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+                var obj=data[0];
+                document.getElementById("OperatorIDss").value=obj.operatorID
+                document.getElementById("OrderIds").value=obj.orderId
+                document.getElementById("CusIds").value=obj.cusId
+                document.getElementById("WarehouseIDs").value=obj.warehouseID
+                document.getElementById("ListRemarkss").value=obj.listRemarks
+                document.getElementById("OrderTotals").value=obj.orderTotal
+                document.getElementById("OrderStates").value=obj.orderState
+                document.getElementById("CreatDates").value=obj.creatDate
+                document.getElementById("CreatUsers").value=obj.creatUser
+
+            },
+            error: function (req, info, e) {
+                alert("失败");
+
+            }
+        };
+        $.ajax(d);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function SaveOpe() {
+        var  SOperatorIDs= document.getElementById("OperatorIDs").value;
+        var  SOrderId= document.getElementById("OrderId").value;
+        var  SCusId = document.getElementById("CusId").value;
+        var   SWarehouseID= document.getElementById("WarehouseID").value;
+        // alert(SWarehouseID)
+        var   SListRemarks= document.getElementById("ListRemarks").value;
+        var   SOrderTotal= document.getElementById("OrderTotal").value;
+        var   SOrderState = document.getElementById("OrderState").value;
+        var  SCreatDate= document.getElementById("CreatDate").value;
+        var  SCreatUser = document.getElementById("CreatUser").value;
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/SaveSales",
+            cache: false,
+            data: {
+                OperatorID:SOperatorIDs,
+                OrderId:SOrderId,
+                CusId:SCusId,
+                WarehouseID:SWarehouseID,
+                ListRemarks: SListRemarks,
+                OrderState :SOrderState,
+                OrderTotal:SOrderTotal,
+                CreatDate: SCreatDate,
+                CreatUser:SCreatUser
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+                alert("提交成功")
+            },
+            error: function (req, info, e) {
+                alert(e);
+
+            }
+        };
+        $.ajax(d);
+
+    }
+
+
+
+
+
+    function UpdateOpe() {
+        //var SProuductID=document.getElementById("ProuductID").value;
+        var  SOperatorIDs= document.getElementById("OperatorIDss").value;
+        //alert(SOperatorIDs)
+        var  SOrderId= document.getElementById("OrderIds").value;
+        //alert( SOrderId)
+        var  SCusId = document.getElementById("CusIds").value;
+        //alert(SCusId)
+        var   SWarehouseID= document.getElementById("WarehouseIDs").value;
+        //alert(SWarehouseID)
+        var   SListRemarks= document.getElementById("ListRemarkss").value;
+        //alert( SListRemarks)
+        var   SOrderTotal= document.getElementById("OrderTotals").value;
+        //alert( SOrderTotal)
+        var   SOrderState = document.getElementById("OrderStates").value;
+        //alert(SOrderState)
+        var  SCreatDate= document.getElementById("CreatDates").value;
+        //alert( SCreatDate)
+        var  SCreatUser = document.getElementById("CreatUsers").value;
+        //alert(SCreatUser)
+        var d = {
+            type: "get",
+            url: "http://localhost:8080/UpdateOpe",
+            cache: false,
+            data: {
+                OperatorID:SOperatorIDs,
+                OrderId:SOrderId,
+                CusId:SCusId,
+                WarehouseID:SWarehouseID,
+                ListRemarks: SListRemarks,
+                OrderState :SOrderState,
+                OrderTotal:SOrderTotal,
+                CreatDate: SCreatDate,
+                CreatUser:SCreatUser
+
+
+            },
+            contentType: "application/json",
+            success: function (data) {
+
+                alert("提交成功")
+            },
+            error: function (req, info, e) {
+                alert(e);
+
+            }
+        };
+        $.ajax(d);
+
+    }
+
+
+
+
+
+
+
+
+
+    function getTable() {
+        var ss="<tr>\n" +
+            "<th>复选框</th>\n"+
+            "<th>退货订单编号</th>\n" +
+            "<th>客户</th>\n" +
+            "<th>仓库</th>\n" +
+            "<th>操作员</th>\n" +
+            "<th>入库商品编号</th>\n" +
+            "<th>备注</th>\n"+
+            "<th>总额</th>\n"+
+            "<th>审批状态</th>\n"+
+            "<th>创建日期</th>\n"+
+            "<th>创建者</th>\n"+
+            "<th>操作</th>\n"+
+            "</tr>";
+        return ss;
+
+
+    }
+
+
+
+
+
+    function deleteOpe() {
+        var m = document.getElementsByName("box");
+        var str = ""
+        var sum=0;
+        for (var i = 0; i < m.length; i++) {
+            var n = m[i];
+
+            if (n.checked) {
+                sum++
+            }
+        }
+        if(sum>1)
+        {
+            alert("不可多选单选框")
+        }
+        else {
+            for (var i = 0; i < m.length; i++) {
+                var n = m[i];
+
+                if (n.checked) {
+                    i--;
+                    var child = n.parentNode.parentNode
+                    var tid = child.children
+                    str = str + "," + tid[1].innerHTML
+                    child.parentNode.removeChild(child)
+
+
+                }
+
+
+            }
+        }
+        var myUrl = "http://localhost:8080/DelOpe";
+        var  order=tid[1].innerHTML
+        var d = {
+            type: "get",
+            url: myUrl,
+            cache: false,
+            data: {
+                OrderId:order,
+                phoneNo: 123
+            },
+            dateType: "json",
+            success: function (data) {
+
+            },
+            error:function (req,info,e) {
+                alert(e);
+
+            }
+        };
+        $.ajax(d);
+    }
+
+
+
+
+
+
+
+</script>
+
+
+
+<body onload="queryAllOpe()">
+
+<div class="col-lg-8" style="width: 80%">
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search for..." Id="OperatorID" >
+        <span class="input-group-btn">
+        <button style="margin-right:20px" class="btn btn-default" type="button" onclick="queryOpe()">Go!</button>
+            <button style="margin-right:20px" class="btn btn-primary " data-toggle="modal" data-target="#myModal">添加</button>
+    <button class="btn btn-warning "   onclick="deleteOpe()">删除</button>
+      </span>
+    </div>
+
+
+
+
+    <!-- 按钮触发模态框 -->
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">订单管理</h4>
+                </div>
+                <div class="modal-body">
+                    <h4>退货单</h4>
+                    订单编号<input type="text"id="OrderId" value="THD-yyyyMMdd-">
+                    操作员<input type="text" id="OperatorIDs">
+
+                    <table class="table table-hover">
+
+
+                        <tr>
+
+                            <th>客户</th>
+                            <th>仓库</th>
+                            <th>入库商品编号</th>
+                            <th>备注</th>
+                            <th>总额</th>
+                            <th>审批状态</th>
+                            <th>创建日期</th>
+                            <th>创建者</th>
+                        </tr>
+
+                        <tr>
+                            <td><input type="text"style="height:30px;width:60px"id="CusId"></td>
+                            <td><input type="text"style="height:31px;width:60px"id=" " value="仓库A"></td>
+                            <td><input type="text"style="height:31px;width:60px"id="WarehouseID"></td>
+                            <td><input type="text"style="height:31px;width:60px"id="ListRemarks"></td>
+                            <td><input type="text"style="height:30px;width:60px"id="OrderTotal" ></td>
+                            <td><input type="text"style="height:31px;width:60px"id="OrderState" value="待审批"></td>
+                            <td><input type="text"style="height:31px;width:60px"id="CreatDate"></td>
+                            <td><input type="text"style="height:31px;width:60px"id="CreatUser"></td>
+
+
+                        </tr>
+
+
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary"ONCLICK="SaveOpe()"data-dismiss="modal">提交保存</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel1">退货单修改</h4>
+                </div>
+                <div class="modal-body">
+
+
+                    <h4>退货单</h4>
+                    订单编号<input type="text"id="OrderIds" value="THD-yyyyMMdd-">
+                    操作员<input type="text" id="OperatorIDss">
+
+                    <table class="table table-hover">
+
+
+                        <tr>
+
+                            <th>客户</th>
+                            <th>仓库</th>
+                            <th>入库商品编号</th>
+                            <th>备注</th>
+                            <th>总额</th>
+                            <th>审批状态</th>
+                            <th>创建日期</th>
+                            <th>创建者</th>
+                        </tr>
+
+                        <tr>
+                            <td><input type="text"style="height:30px;width:60px"id="CusIds"></td>
+                            <td><input type="text"style="height:31px;width:60px"id=" " value="仓库A"></td>
+                            <td><input type="text"style="height:31px;width:60px"id="WarehouseIDs"></td>
+                            <td><input type="text"style="height:31px;width:60px"id="ListRemarkss"></td>
+                            <td><input type="text"style="height:30px;width:60px"id="OrderTotals" ></td>
+                            <td><input type="text"style="height:31px;width:60px"id="OrderStates" value="待审批"></td>
+                            <td><input type="text"style="height:31px;width:60px"id="CreatDates"></td>
+                            <td><input type="text"style="height:31px;width:60px"id="CreatUsers"></td>
+
+
+                        </tr>
+
+
+                    </table>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="UpdateOpe()"data-dismiss="modal">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<table class="table table-hover" id="myTable" style="width: 100%"   >
+    <caption>退货单</caption>
+</table>
+</body>
+</html>

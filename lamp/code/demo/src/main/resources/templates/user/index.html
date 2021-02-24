@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="http://localhost:8080/js/jquery-3.4.1.js"></script>
+    <script src="http://localhost:8080/js/bootstrap.min.js"></script>
+    <link href="http://localhost:8080/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="http://localhost:8080/css/nav.css">
+    <style type="text/css">
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+
+        body,html{
+            height: 100%;
+            width: 100%;
+        }
+
+        #header{
+            height: 8%;
+            background-color: rgba(84,92,100,1);
+            padding: 0 40px;
+        }
+
+        #userMsg{
+            height: 50px;
+            width: 50px;
+            margin: 5px 0;
+            padding: 0px;
+            border-radius: 25px;
+            line-height: 60px;
+            font-size: 24px;
+            background-color: palegreen;
+            border: none;
+            outline: none;
+        }
+
+        #relogin{
+            line-height: 60px;
+            height: 60px;
+            font-weight: revert;
+            font-size: 20px;
+            color: orange;
+        }
+
+        #pageBody{
+            height: 86%;
+
+        }
+
+        #leftMain{
+            background-color: lightcyan;
+            height: 100%;
+        }
+
+        #rightContext{
+            background-color: aliceblue;
+            height: 100%;
+            padding: 5px;
+        }
+
+        #footer{
+            height: 6%;
+            line-height: 42px;
+            color: lightcyan;
+            text-align: center;
+            background-color: rgba(84,92,100,1);
+        }
+
+        #newFrame{
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body onload="loadMenu()">
+<div style="height: 100%;">
+    <div id="header">
+        <div class="col-lg-4">
+            <span style="color: lightblue;font-weight: bolder;font-size: 24px;line-height: 60px;height: 60px;">进销存管理系统</span>
+        </div>
+        <div class="col-lg-6"></div>
+        <div id="userMsg"
+             class="col-lg-1"
+             onclick="showMsg()"
+             tabindex="0"
+             role="button"
+             title="个人信息"
+             data-container="body"
+             data-toggle="popover"
+             data-trigger="focus"
+             data-placement="bottom">
+            <div class="glyphicon glyphicon-user" style="position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);">
+            </div>
+        </div>
+        <div id="relogin" class="col-lg-1" onclick="logOut()">登录/退出</div>
+    </div>
+    <div id="pageBody">
+        <div id="leftMain" class="col-lg-2" style="padding: 0px">
+            <div class="nav">
+                <div class="nav-top">
+                    <div id="mini" style="border-bottom:1px solid rgba(255,255,255,1)"><img src="http://localhost:8080/img/mini.png" ></div>
+                </div>
+                <ul id="menuList">
+                </ul>
+            </div>
+        </div>
+        <div id="rightContext" class="col-lg-10">
+            <iframe src="" id="newFrame" frameborder="0" name="item" style="padding: 5px">
+                aaaaa
+            </iframe>
+        </div>
+    </div>
+    <div id="footer" >&copy;源图新一班</div>
+</div>
+</body>
+<script>
+
+
+
+    function logOut(){
+        var outData = {
+            type:"post",
+            url:"/logOut",
+            cache:false,
+            data:{},
+            dataType:"text",
+            success:function (data) {
+                alert("退出成功");
+                window.location="";
+            },
+            error:function () {
+                alert("系统错误");
+            }
+        }
+        $.ajax(outData);
+    }
+
+    function loadPage(ele) {
+        var opUrl = ele.title;
+        alert(opUrl);
+        var loadData = {
+            type:"post",
+            url:"/user/tpUrl",
+            cache:false,
+            data:{
+                openUrl:opUrl,
+            },
+            dataType:"text",
+            success:function(data){
+                alert(data);
+                document.getElementById("rightContext").innerHTML = data;
+            },
+            erroe:function(){
+                alert("error");
+            }
+        }
+        $.ajax(loadData);
+    }
+
+    function showMsg(){
+        var userData = {
+            type:"post",
+            url:"/getSession",
+            cache:"false",
+            data:{},
+            dataType:"json",
+            success:function(data){
+                $("[data-toggle='popover']").popover({
+                    html : true,
+                    content:"<span>工号："+data.userId+"</span><br>" +
+                        "<span>姓名："+data.userName+"</span><br>" +
+                        "<span>权限："+data.userRole+"</span>"
+                });
+            },
+            error:function(){
+                alert("你妈炸了");
+            }
+        }
+        $.ajax(userData);
+    }
+
+    function loadMenu() {
+        var menuData = {
+            type:"post",
+            url:"/loadMenu",
+            cache:false,
+            data:{},
+            dataType:"json",
+            success:function(data){
+                var str = "";
+                for(var i = 0;i < data.length;i++){
+                    var obj = data[i];
+                    if(obj.parentId == null){
+                        if(obj.funLv == 1){
+                            str += "<li class='nav-item'>" +
+                                "<a class='lis' href='"+obj.funUrl+"' target='item'><i class='glyphicon nav-icon icon_"+obj.funId+"'></i>" +
+                                "<span>"+obj.funName+"</span></a>" +
+                                "</li>"
+                        }else{
+                            str += "<li class='nav-item'>" +
+                                "<a class='lis' href='"+obj.funUrl+"' target='item'><i class='glyphicon nav-icon icon_"+obj.funId+"'></i>" +
+                                "<span>"+obj.funName+"</span>" +
+                                "<i class='glyphicon nav-more'></i></a>" +
+                                "<ul id='"+obj.funId+"' class='hideUl'>";
+                            var temp = obj.funId;
+                            for(var j = 0;j < data.length;j++){
+                                if(data[j].funId.includes(obj.funId)&&(data[j].funId != obj.funId)){
+                                    str += "<li><a href='"+data[j].funUrl+"' target='item'><span>"+data[j].funName+"</span></a></li>"
+                                }
+                            }
+                            str +="</ul>" +
+                                  "</li>"
+                        }
+                    }
+                }
+                document.getElementById("menuList").innerHTML = str;
+
+                $(document).ready(function(){
+                    // nav收缩展开
+                    $('a.lis').on('click',function(){
+                        if ($(this).next().css('display') == "none") {
+                            //展开未展开
+                            $('.nav-item').children('ul').slideUp(300);
+                            $(this).next('ul').slideDown(300);
+                            $(this).parent('li').addClass('nav-show').siblings('li').removeClass('nav-show');
+                        }else{
+                            //收缩已展开
+                            $(this).next('ul').slideUp(300);
+                            $('.nav-item.nav-show').removeClass('nav-show');
+                        }
+                    });
+                });
+            },
+            error:function () {
+                alert("error");
+            }
+        }
+        $.ajax(menuData);
+    }
+
+</script>
+<!--<script type="text/javascript" src="/js/nav.js"></script>-->
+</html>

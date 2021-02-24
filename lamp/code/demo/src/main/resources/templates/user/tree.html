@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="http://localhost:8080/js/jquery.mins.js"></script>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery.easyui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://localhost:8080/css/easyui.css"/>
+
+
+    <title>Title</title>
+    <script>
+
+        function initTree(){
+            $('#deptTree').tree({
+                type: "get",
+                animate:true,
+                lines:true,
+                url: "http://localhost:8080/initTree",
+
+                onBeforeExpand:function(node){
+                    $('#deptTree').tree('options').url = "http://localhost:8080/findTreeNode?" + node.id;
+                },
+                onClick:function(node){
+                    //鼠标点击后的事件
+
+                }
+            });
+        }
+    </script>
+</head>
+<body onload="initTree()">
+
+<div>
+    <ul id="deptTree"></ul>
+</div>
+</body>
+</html>

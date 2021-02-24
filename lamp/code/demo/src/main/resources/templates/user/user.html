@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery-3.4.1.js"></script>
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap.css">
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap-theme.css">
+    <script type="text/javascript" src="http://localhost:8080/js/bootstrap.js"></script>
+    <style type="text/css">
+        .modal-width{
+            width: 400px;
+        }
+        th{
+            text-align: center;
+        }
+        tr{
+            height: 40px;
+        }
+    </style>
+</head>
+<body onload="showUser()">
+<div class="col-lg-8" >
+    <div class="input-group" style="width: 60%;">
+        <input class="form-control" type="text" placeholder="请输入工号" id="queryId">
+        <span class="input-group-btn">
+        <input style="margin-right:20px" class="btn btn-default" type="button" value="查询" onclick="showUser()">
+        <input class="btn btn-primary" type="button" value="添加用户" data-toggle="modal" onclick="showModel()">
+        </span>
+    </div>
+</div>
+<table id="userList" width="400" class="table table-border table-hover" border="1">
+
+</table>
+<input id="hideId" style="display: none">
+<input id="hidePsd" style="display: none">
+<input id="hideName" style="display: none">
+<input id="roles" style="display: none">
+</body>
+<script>
+    /**
+     * 描述:插入数据
+     */
+    function addNewUser() {
+        var uId = document.getElementById("userId").value;
+        var psd = document.getElementById("userPsd").value;
+        var uName = document.getElementById("userName").value;
+        var roleArr = document.getElementsByName("userRole");
+        var roles = "";
+        for(var i = 0;i < roleArr.length;i++){
+            if(roleArr[i].checked){
+                roles += roleArr[i].value + "";
+            }
+        }
+        if(roles == ""){
+            alert("权限不能为空")
+        }else{
+            var userData = {
+                type:"post",
+                url:"/add",
+                cache:false,
+                data:{
+                    userId:uId,
+                    userPsd:psd,
+                    userName:uName,
+                    userRole:roles,
+                    delStage:1
+                },
+                dataType:"text",
+                success:function(data){
+                    alert("添加成功");
+                    showUser();
+                },
+                error:function(){
+                    alert("你妈炸了");
+                }
+            }
+        }
+        $.ajax(userData);
+    }
+
+    /**
+     * 描述:新增用户（查询方法）
+     */
+    function addUser(){
+        var uId = document.getElementById("userId").value;
+        var queryUserData = {
+            type:"post",
+            url:"/queryUser",
+            cache:false,
+            data:{
+                userId:uId
+            },
+            dataType:"json",
+            success:function(data){
+                alert("该用户已存在")
+            },
+            error:function(){
+                $('#exampleModal').modal('hide');
+                addNewUser();
+            }
+        }
+        $.ajax(queryUserData)
+    }
+
+    /**
+     * 描述:显示用户
+     */
+    function showUser(){
+        var uId = document.getElementById("queryId").value;
+        if(null == uId){
+            uId = "";
+        }
+        var queryUserData = {
+            type:"post",
+            url:"/queryUserList",
+            cache:false,
+            data:{
+                userId:uId,
+            },
+            dataType:"json",
+            success:function(data){
+                var tab = "<tr>" +
+                          "<th>工号</th>" +
+                          "<th>密码</th>" +
+                          "<th>姓名</th>" +
+                          "<th>权限</th>" +
+                          "<th colspan='2'>操作</th>"
+                          "</tr>"
+                var str = "";
+                if(data.length < 1){
+                    alert("查无此人")
+                }else{
+                    for(var i = 0;i < data.length;i++){
+                        var obj = data[i];
+                        var temp = "<tr>"+
+                            "<td>" + obj.userId + "</td>" +
+                            "<td>" + obj.userPsd + "</td>" +
+                            "<td>" + obj.userName + "</td>" +
+                            "<td>" + obj.userRole + "</td>" +
+                            "<td><button class='btn btn-primary btn-sm' onclick='loadUser(this)' value='"+obj.userId+"'>修改</button></td>" +
+                            "<td><button class='btn btn-danger btn-sm' onclick='delUser(this)' value='"+obj.userId+"'>删除</button></td>" +
+                            "</tr>";
+                        if(str.length == 0){
+                            str = temp;
+                        }else{
+                            str += temp;
+                        }
+                    }
+                    document.getElementById("userList").innerHTML = tab + str;
+                }
+            },
+            error:function(){
+                alert("查询失败");
+            }
+        }
+        $.ajax(queryUserData)
+    }
+
+    /**
+     * 描述:显示模态框
+     */
+    function showModel(ele) {
+        $('#exampleModal').modal('show');
+        document.getElementById("exampleModalLabel").innerHTML = "添加用户";
+        var btn = "";
+        var uId = document.getElementById("userId");
+        var uName = document.getElementById("userName");
+        if(ele == undefined){
+            uId.disabled = false;
+            uName.disabled = false;
+            btn = "<button type='button' class='btn btn-primary' data-dismiss='modal'>取消</button>" +
+                "<button type='button' class='btn btn-success' onclick='addUser()'>提交</button>";
+        }else{
+            uId.disabled = true;
+            uName.disabled = true;
+            btn = "<button type='button' class='btn btn-primary' data-dismiss='modal'>取消</button>" +
+                "<button type='button' class='btn btn-success' onclick='editUser()'>修改</button>";
+        }
+        document.getElementById("modalFoot").innerHTML = btn;
+        clearInput();
+    }
+
+    /**
+     * 描述:加载数据
+     * @param ele
+     */
+    function loadUser(ele){
+        showModel(ele);
+        document.getElementById("exampleModalLabel").innerHTML = "修改用户";
+        var uId = ele.value;
+        var queryUserData = {
+            type:"post",
+            url:"/queryUser",
+            cache:false,
+            data:{
+                userId:uId
+            },
+            dataType:"json",
+            success:function(data){
+                var obj = data
+                document.getElementById("userId").value = obj.userId;
+                document.getElementById("userPsd").value = obj.userPsd;
+                document.getElementById("userName").value = obj.userName;
+                var roles = obj.userRole.split("");
+                var roleArr = document.getElementsByName("userRole");
+                for(var i = 0;i < roles.length;i++){
+                    for(var j = 0;j < roleArr.length;j++){
+                        if(roles[i] == roleArr[j].value){
+                            roleArr[j].checked = true;
+                        }
+                    }
+                }
+            },
+            error:function(){
+                alert("XX失败");
+            }
+        }
+        $.ajax(queryUserData)
+    }
+
+    /**
+     * 描述:修改信息
+     */
+    function editUser() {
+        var uId = document.getElementById("userId").value;
+        var psd = document.getElementById("userPsd").value;
+        var uName = document.getElementById("userName").value;
+        var roleArr = document.getElementsByName("userRole");
+        var roles = "";
+        for(var i = 0;i < roleArr.length;i++){
+            if(roleArr[i].checked){
+                roles += roleArr[i].value + "";
+            }
+        }
+        if(roles == ""){
+            alert("权限不能为空")
+        }else{
+            var userData = {
+                type:"post",
+                url:"/add",
+                cache:false,
+                data:{
+                    userId:uId,
+                    userPsd:psd,
+                    userName:uName,
+                    userRole:roles,
+                    delStage:1
+                },
+                dataType:"text",
+                success:function(data){
+                    alert("修改成功");
+                    $('#exampleModal').modal('hide');
+                    showUser();
+                },
+                error:function(){
+                    alert("你妈炸了");
+                }
+            }
+        }
+        $.ajax(userData);
+    }
+
+    /**
+     * 描述:删除
+     * @param ele
+     */
+    function delUser(ele){
+        readUser(ele);
+    }
+
+    /**
+     * 描述:初始化input
+     */
+    function clearInput(){
+        document.getElementById("userId").value = "";
+        document.getElementById("userPsd").value = "";
+        document.getElementById("userName").value = "";
+        var roleArr = document.getElementsByName("userRole");
+        for(var i = 0;i < roleArr.length;i++){
+            roleArr[i].checked = false;
+        }
+    }
+
+    /**
+     * 描述:读取用户信息
+     * @param ele
+     */
+    function readUser(ele){
+        var uId = ele.value;
+        var queryUserData = {
+            type:"post",
+            url:"/queryUser",
+            cache:false,
+            data:{
+                userId:uId
+            },
+            dataType:"json",
+            success:function(data){
+                var obj = data;
+                document.getElementById("hideId").value = obj.userId;
+                document.getElementById("hidePsd").value = obj.userPsd;
+                document.getElementById("hideName").value = obj.userName;
+                document.getElementById("roles").value =  obj.userRole;
+                editDelStage();
+            },
+            error:function(){
+                alert("查询失败");
+            }
+        }
+        $.ajax(queryUserData)
+    }
+
+    /**
+     * 描述:修改删除状态
+     */
+    function editDelStage(){
+        var uId = document.getElementById("hideId").value;
+        var psd = document.getElementById("hidePsd").value;
+        var uName = document.getElementById("hideName").value;
+        var roles = document.getElementById("roles").value;
+        var userData = {
+            type:"post",
+            url:"/add",
+            cache:false,
+            data:{
+                userId:uId,
+                userPsd:psd,
+                userName:uName,
+                userRole:roles,
+                delStage:0
+            },
+            dataType:"text",
+            success:function(data){
+                alert("删除成功");
+                showUser();
+                window.location.reload();
+            },
+            error:function(){
+                alert("你妈炸了");
+            }
+        }
+        $.ajax(userData);
+    }
+</script>
+</html>

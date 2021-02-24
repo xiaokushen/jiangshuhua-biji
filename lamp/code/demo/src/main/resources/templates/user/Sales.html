@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery-3.4.1.js"></script>
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap.css">
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap-theme.css">
+    <script type="text/javascript" src="http://localhost:8080/js/bootstrap.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        table td, table th {
+            border: 1px solid #cad9ea;
+            color: #666;
+            height: 30px;
+        }
+
+        table thead th {
+            background-color: #CCE8EB;
+            width: 100px;
+        }
+
+        table tr:nth-child(odd) {
+            background: #fff;
+        }
+
+        table tr:nth-child(even) {
+            background: #F5FAFA;
+        }
+
+
+    </style>
+    <script>
+        <!--模糊查询查全部未被删除-->
+        function querySales() {
+            var myUrl = "http://localhost:8080/querySalesById";
+            var salorderId = document.getElementById("salorderId").value;
+            var d = {
+                type: "post",
+                url: myUrl,
+                cache: false,
+                data: {
+                    salorderId: salorderId
+                },
+                dataType: "json",
+                success: function (data) {
+                    //var tab = getTable();
+                    var str = "";
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+                        rowA = obj.rowId;
+                        var temp = "<tr>" +
+                            "<td style='display: none'><input type='hidden' value=" + rowA + "></td>" +
+                            "<td style=\"width: 5%\">" + obj.shiplistId + "</td>" +
+                            "<td style=\"width: 10%\">" + obj.cusId + "</td>" +
+                            "<td style=\"width: 10%\">" + obj.salesname + "</td>" +
+                            "<td style=\"width: 10%\">" + obj.warehouseId + "</td>" +
+                            "<td style=\"width: 15%\">" + obj.salorderId + "</td>" +
+                            "<td style=\"width: 10%\">" + obj.salesstate + "</td>" +
+                            "<td style=\"width: 10%\">" + obj.salesremarks + "</td>" +
+                            "<td style=\"width: 10%\">" + obj.salesbefomoney + "</td>" +
+                            "<td style=\"width: 20%\"><input id=" + rowA + " type='button' value='修改' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#uexampleModal' onclick='quSalesByrowId(this)' >" +
+                            "&nbsp;&nbsp;<input id=" + rowA + " type='button' value='查看详情' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#uexampleModal' onclick='lookSalesByrowId(this)'>" +
+                            "&nbsp;&nbsp;<input type='button' value='作废' class='btn btn-warning btn-sm' onclick='deleteSalesById(this)'></td>" +
+                            "</tr>";
+                        if (str.length == 0) {
+                            str = temp;
+                        } else {
+                            str = str + temp;
+                        }
+                    }
+                    document.getElementById("myTable").innerHTML = str;
+                    goPage(1, 3);
+                },
+                error: function () {
+                    alert(salorderId);
+                }
+            };
+            $.ajax(d);
+        }
+
+        // // 生成表格标题栏
+        // function getTable() {
+        //     var ss = "<tr>\n" +
+        //         "<th></th>\n" +
+        //         "<th>序号</th>\n" +
+        //         "<th>客户编号</th>\n" +
+        //         "<th>销售员名称</th>\n" +
+        //         "<th>仓库编号</th>\n" +
+        //         "<th>订单编号</th>\n" +
+        //         "<th>订单类型</th>\n" +
+        //         "<th>操作</th>\n" +
+        //         "</tr>";
+        //     return ss;
+        // }
+
+        // 增加订单
+        function addSales() {
+            var myUrl = "http://localhost:8080/addSales";
+            var addsalorderId = document.getElementById("addsalorderId").value;
+            var cusId = document.getElementById("cusId").value;
+            var salesname = document.getElementById("salesname").value;
+            var warehouseId = document.getElementById("warehouseId").value;
+            var shiplistId = document.getElementById("shiplistId").value;
+            var salesstate = document.getElementById("salesstate").value;
+            var salesbefomoney = document.getElementById("salesbefomoney").value;
+            var salesremarks = document.getElementById("salesremarks").value;
+
+            var d = {
+                type: "post",
+                url: myUrl,
+                cache: false,
+                data: {
+                    salorderId: addsalorderId,
+                    cusId: cusId,
+                    salesname: salesname,
+                    warehouseId: warehouseId,
+                    shiplistId: shiplistId,
+                    salesstate: salesstate,
+                    salesbefomoney:salesbefomoney,
+                    salesremarks:salesremarks
+                },
+                dataType: "text",
+                success: function (data) {
+                    querySales("");
+                },
+                error: function (data) {
+                    alert("error" + data);
+                }
+            };
+            $.ajax(d);
+        }
+
+        //修改订单
+        function updateSales() {
+            var myUrl = "http://localhost:8080/updateSales";
+            var addsalorderId = document.getElementById("uaddsalorderId").value;
+            var cusId = document.getElementById("ucusId").value;
+            var salesname = document.getElementById("usalesname").value;
+            var warehouseId = document.getElementById("uwarehouseId").value;
+            var shiplistId = document.getElementById("ushiplistId").value;
+            var salesremarks = document.getElementById("usalesremarks").value;
+            var salesbefomoney = document.getElementById("usalesbefomoney").value;
+            var rowId = document.getElementById("rowIdd").value;
+            var d = {
+                type: "post",
+                url: myUrl,
+                cache: false,
+                data: {
+                    rowId: rowId,
+                    salorderId: addsalorderId,
+                    cusId: cusId,
+                    salesname: salesname,
+                    warehouseId: warehouseId,
+                    shiplistId: shiplistId,
+                    salesremarks:salesremarks,
+                    salesbefomoney:salesbefomoney
+                },
+                dataType: "json",
+                success: function (data) {
+                    querySales("");
+                },
+                error: function (data) {
+                    alert("error" + data);
+                }
+            };
+            $.ajax(d);
+        }
+
+        //根据主键查询单条记录
+        function quSalesByrowId(rowId) {
+            var myUrl = "http://localhost:8080/querySalesByrowId";
+            var ids = rowId.parentNode.parentNode.childNodes[0].childNodes[0];
+            var id = ids.value;
+            var d = {
+                type: "post",
+                url: myUrl,
+                cache: false,
+                data: {
+                    rowId: id
+                },
+                dataType: "json",
+                success: function (data) {
+                    var sales = data;
+                    document.getElementById("rowIdd").value = sales.rowId;
+                    document.getElementById("ushiplistId").value = sales.shiplistId;
+                    document.getElementById("uaddsalorderId").value = sales.salorderId;
+                    document.getElementById("ucusId").value = sales.cusId;
+                    document.getElementById("usalesname").value = sales.salesname;
+                    document.getElementById("uwarehouseId").value = sales.warehouseId;
+                    document.getElementById("usalesbefomoney").value = sales.salesbefomoney;
+                    document.getElementById("usalesremarks").value = sales.salesremarks;
+                    document.getElementById("uexampleModalLabel").innerHTML = "修改销售单";
+                    document.getElementById("buttons").style = "";
+                },
+                error: function () {
+                    alert(salorderId);
+                }
+            };
+            $.ajax(d);
+        }
+
+        //查看详情
+        function lookSalesByrowId(rowId) {
+            var myUrl = "http://localhost:8080/querySalesByrowId";
+            var ids = rowId.parentNode.parentNode.childNodes[0].childNodes[0];
+            var id = ids.value;
+            var d = {
+                type: "post",
+                url: myUrl,
+                cache: false,
+                data: {
+                    rowId: id
+                },
+                dataType: "json",
+                success: function (data) {
+                    var sales = data;
+                    document.getElementById("rowIdd").value = sales.rowId;
+                    document.getElementById("ushiplistId").value = sales.shiplistId;
+                    document.getElementById("uaddsalorderId").value = sales.salorderId;
+                    document.getElementById("ucusId").value = sales.cusId;
+                    document.getElementById("usalesname").value = sales.salesname;
+                    document.getElementById("uwarehouseId").value = sales.warehouseId;
+                    document.getElementById("uexampleModalLabel").innerHTML = "订单详情";
+                    document.getElementById("buttons").style = "display: none";
+                },
+                error: function () {
+                    alert(salorderId);
+                }
+            };
+            $.ajax(d);
+        }
+
+        //逻辑删除
+        function deleteSalesById(rowId) {
+            var myUrl = "http://localhost:8080/deleteSalesById";
+            var ids = rowId.parentNode.parentNode.childNodes[0].childNodes[0];
+            var id = ids.value;
+            var d = {
+                type: "post",
+                url: myUrl,
+                cache: false,
+                data: {
+                    rowId: id,
+                    deletstat: "N"
+                },
+                dataType: "text",
+                success: function () {
+                    querySales("");
+                },
+                error: function () {
+                    alert(salorderId);
+                }
+            };
+            $.ajax(d);
+        }
+
+        //选择订单类型
+        function radio() {
+            var radio = document.getElementsByName("sales");
+            for (var i = 0; i < radio.length; i++) {
+                if (radio[i].checked) {
+                    document.getElementById("salesstate").value = radio[i].value
+                }
+            }
+            var state = document.getElementById("salesstate").value;
+            if (state == "销售退货单") {
+                document.getElementById("addsalorderId").value = "XSTHD-yyyyMMdd-"
+            } else {
+                document.getElementById("addsalorderId").value = "XSD-yyyyMMdd-"
+            }
+        }
+
+        /**
+         * 分页函数
+         * pno--页数
+         * psize--每页显示记录数
+         * 分页部分是从真实数据行开始，因而存在加减某个常数，以确定真正的记录数
+         * 纯js分页实质是数据行全部加载，通过是否显示属性完成分页功能
+         **/
+        function goPage(pno, psize) {
+            var itable = document.getElementById("myTable");
+            var num = itable.rows.length;//表格所有行数(所有记录数)
+            console.log(num);
+            var totalPage = 0;//总页数
+            var pageSize = psize;//每页显示行数
+            //总共分几页
+            if (num / pageSize > parseInt(num / pageSize)) {
+                totalPage = parseInt(num / pageSize) + 1;
+            } else {
+                totalPage = parseInt(num / pageSize);
+            }
+            var currentPage = pno;//当前页数
+            var startRow = (currentPage - 1) * pageSize + 1;//开始显示的行 31
+            var endRow = currentPage * pageSize;//结束显示的行  40
+            endRow = (endRow > num) ? num : endRow;  //40
+            console.log(endRow);
+            //遍历显示数据实现分页
+            for (var i = 1; i < (num + 1); i++) {
+                var irow = itable.rows[i - 1];
+                if (i >= startRow && i <= endRow) {
+                    irow.style.width = "100%";
+                    // irow.style.display = "block";
+                    irow.style.display = "inline-table";
+                } else {
+                    irow.style.display = "none";
+                }
+            }
+            var tempStr = "共" + num + "条记录 分" + totalPage + "页 当前第" + currentPage + "页";
+            if (currentPage > 1) {
+                tempStr += "<a href=\"#\" onClick=\"goPage(" + (1) + "," + psize + ")\">首页</a>";
+                tempStr += "<a href=\"#\" onClick=\"goPage(" + (currentPage - 1) + "," + psize + ")\"><上一页</a>"
+            } else {
+                tempStr += "首页";
+                tempStr += "<上一页";
+            }
+            if (currentPage < totalPage) {
+                tempStr += "<a href=\"#\" onClick=\"goPage(" + (currentPage + 1) + "," + psize + ")\">下一页></a>";
+                tempStr += "<a href=\"#\" onClick=\"goPage(" + (totalPage) + "," + psize + ")\">尾页</a>";
+            } else {
+                tempStr += "下一页>";
+                tempStr += "尾页";
+            }
+            document.getElementById("barcon").innerHTML = tempStr;
+        }
+
+        function select() {
+            var psize = document.getElementById("select").value;
+            goPage(1, psize);
+        }
+    </script>
+</head>
+<body>
+<div class="col-lg-8" style="width: 80%">
+    <div  class="input-group">
+        <input type="hidden" id="rowId">
+        <input  type="text" class="form-control" placeholder="输入订单编号查询" Id="salorderId">
+        <span class="input-group-btn">
+        <button style="margin-right:20px" class="btn btn-default" type="button" onclick="querySales()">查询</button>
+            <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#exampleModal">新增</button>
+      </span>
+    </div>
+
+</div>
+<!--表头-->
+<table border="1" style="align-content: center" class="table table-border table-hover">
+    <tr>
+        <th style="display: none"></th>
+        <th style="width: 5%">序号</th>
+        <th style="width: 10%">客户编号</th>
+        <th style="width: 10%">销售员名称</th>
+        <th style="width: 10%">仓库编号</th>
+        <th style="width: 15%">订单编号</th>
+        <th style="width: 10%">订单编号</th>
+        <th style="width: 10%">商品名称</th>
+        <th style="width: 10%">总价</th>
+        <th style="width: 20%">操作</th>
+    </tr>
+</table>
+<!--新增订单模态框-->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel" >新增销售单</h4>
+                <!--style="text-align: center"-->
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="shiplistId" class="control-label">序号</label>
+                        <input type="text" class="form-control" id="shiplistId">
+                    </div>
+                    <div class="form-group">
+                        <label for="warehouseId" class="control-label">订单类型</label> <br>
+                        <input type="radio" name="sales" value="销售单" onclick="radio()">销售单
+                        <input type="radio" name="sales" value="销售退货单" onclick="radio()">销售退货单
+                        <input type="hidden" id="salesstate">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addsalorderId" class="control-label">销售单编号</label>
+                        <input type="text" class="form-control" id="addsalorderId" value="XSD-yyyyMMdd-">
+                    </div>
+                    <div class="form-group">
+                        <label for="cusId" class="control-label">客户编号</label>
+                        <input type="text" class="form-control" id="cusId">
+                    </div>
+                    <div class="form-group">
+                        <label for="salesname" class="control-label">销售员名称</label>
+                        <input type="text" class="form-control" id="salesname">
+                    </div>
+                    <div class="form-group">
+                        <label for="warehouseId" class="control-label">仓库编号</label>
+                        <input type="text" class="form-control" id="warehouseId">
+                    </div>
+                    <div class="form-group">
+                        <label for="salesremarks" class="control-label">商品名称</label>
+                        <input type="text" class="form-control" id="salesremarks">
+                    </div>
+                    <div class="form-group">
+                        <label for="salesbefomoney" class="control-label">总价</label>
+                        <input type="text" class="form-control" id="salesbefomoney">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="addSales()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--修改订单模态框-->
+<div class="modal fade" id="uexampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog modal-width" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="uexampleModalLabel" style="text-align: center">修改销售单</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="shiplistId" class="control-label">序号</label>
+                        <input type="text" class="form-control" id="ushiplistId">
+                        <input type="hidden" class="form-control" id="rowIdd">
+                    </div>
+                    <div class="form-group">
+                        <label for="addsalorderId" class="control-label">销售单编号</label>
+                        <input type="text" class="form-control" id="uaddsalorderId" value="XSD-yyyyMMdd-">
+                    </div>
+                    <div class="form-group">
+                        <label for="cusId" class="control-label">客户编号</label>
+                        <input type="text" class="form-control" id="ucusId">
+                    </div>
+                    <div class="form-group">
+                        <label for="salesname" class="control-label">销售员名称</label>
+                        <input type="text" class="form-control" id="usalesname">
+                    </div>
+                    <div class="form-group">
+                        <label for="warehouseId" class="control-label">仓库编号</label>
+                        <input type="text" class="form-control" id="uwarehouseId">
+                    </div>
+                    <div class="form-group">
+                        <label for="salesremarks" class="control-label">商品名称</label>
+                        <input type="text" class="form-control" id="usalesremarks">
+                    </div>
+                    <div class="form-group">
+                        <label for="salesbefomoney" class="control-label">总价</label>
+                        <input type="text" class="form-control" id="usalesbefomoney">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" id="buttons">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="updateSales()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+<table  style="width: 100%" id="myTable" class="table table-border table-hover"></table>
+<table width="100%" align="right">
+    <tr>
+        <td>每页显示：<select onchange="select()" id="select">
+            <option value="3">3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+        </select>&nbsp;&nbsp;&nbsp;条
+            <div id="barcon" name="barcon"></div>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,78 @@
+package com.example.demo.entity;
+
+import lombok.Data;
+import lombok.Generated;
+
+import javax.persistence.*;
+
+@Data
+@Entity
+@Table(name = "yt_student") //数据库中的表名
+public class Student {
+    @Id//设置主键
+    @GeneratedValue(strategy = GenerationType.IDENTITY)//主键自增长
+    @Column(name = "row_id")
+    private int stuId;
+
+    @Column(name = "stu_name")
+    private String stuName;
+
+    @Column(name = "stu_pwd")
+    private String stuPwd;
+
+    @Column(name = "stu_age")
+    private int stuAge;
+
+    @Column(name = "stu_sex")
+    private String stuSex;
+
+    public Student() {
+    }
+
+    public Student(String stuName, String stuPwd, int stuAge, String stuSex) {
+        this.stuName = stuName;
+        this.stuPwd = stuPwd;
+        this.stuAge = stuAge;
+        this.stuSex = stuSex;
+    }
+
+    public int getStuId() {
+        return stuId;
+    }
+
+    public void setStuId(int stuId) {
+        this.stuId = stuId;
+    }
+
+    public String getStuName() {
+        return stuName;
+    }
+
+    public void setStuName(String stuName) {
+        this.stuName = stuName;
+    }
+
+    public String getStuPwd() {
+        return stuPwd;
+    }
+
+    public void setStuPwd(String stuPwd) {
+        this.stuPwd = stuPwd;
+    }
+
+    public int getStuAge() {
+        return stuAge;
+    }
+
+    public void setStuAge(int stuAge) {
+        this.stuAge = stuAge;
+    }
+
+    public String getStuSex() {
+        return stuSex;
+    }
+
+    public void setStuSex(String stuSex) {
+        this.stuSex = stuSex;
+    }
+}

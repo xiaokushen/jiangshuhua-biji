@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-3.4.1.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/login.css">
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="register-form">
+    <div class="link">
+        <span class="ring"></span>
+        <span class="ring"></span>
+        <span class="ring"></span>
+        <span class="ring"></span>
+        <span class="ring"></span>
+        <div>
+            <form method="post" action="#">
+                <span class="icon-1"></span><input type="text" id="user"><br />
+                <span class="icon-2"></span><input type="text" id="pwd"><br />
+                <span class="icon-3"></span><input type="text" id="age"><br />
+                <span class="icon-4"></span><input type="text" id="sex"><br />
+                <input type="button" id="cancel" value="取消" onclick="backLogin()"/>
+                <input type="button" id="subbtn" value="提交" onclick="subMsg()"/>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function backLogin(){
+        window.open('login','_self','height=500 width=500 top=300 left=400');
+    }
+    function addUser(){
+        var user = document.getElementById("user").value;
+        var pwd = document.getElementById("pwd").value;
+        var age = document.getElementById("age").value;
+        var sex = document.getElementById("sex").value;
+        var addData = {
+            type:"post",
+            url:"/add",
+            cache:false,
+            data:{
+                stuName:user,
+                stuPwd:pwd,
+                stuAge:age,
+                stuSex:sex
+            },
+            dataType:"text",
+            success:function(data){
+                console.log(data)
+                alert("注册成功")
+                window.open('login','_self','height=500 width=500 top=300 left=400');
+            },
+            error:function(){
+              alert("注册失败");
+            }
+        }
+        $.ajax(addData);
+    }
+
+    function subMsg(){
+        var user = document.getElementById("user").value;
+        var queryData = {
+            type:"post",
+            url:"/queryStudent",
+            cache:false,
+            data:{
+                stuName:user,
+            },
+            dataType:"json",
+            success:function(data){
+                console.log(data)
+                if(data.length == 0){
+                    addUser();
+                }else{
+                    alert("用户已存在");
+                }
+            },
+            error:function(){
+                alert("查询失败");
+            }
+        }
+        $.ajax(queryData);
+    }
+</script>
+</body>
+</html>
