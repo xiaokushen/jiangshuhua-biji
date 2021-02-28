@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="http://localhost:8080/js/jquery-3.4.1.js"></script>
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap.css">
+    <link rel="stylesheet" href="http://localhost:8080/css/bootstrap-theme.css">
+    <script type="text/javascript" src="http://localhost:8080/js/bootstrap.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        table td, table th {
+            border: 1px solid #cad9ea;
+            color: #666;
+            height: 30px;
+        }
+
+        table thead th {
+            background-color: #CCE8EB;
+            width: 100px;
+        }
+
+        table tr:nth-child(odd) {
+            background: #fff;
+        }
+
+        table tr:nth-child(even) {
+            background: #F5FAFA;
+        }
+
+
+    </style>
+    <script>
+
+        // 表头
+        function getTable(){
+            var ss = "<tr>\n" +
+                "<th>\n" +
+                "<input type='checkbox' onclick='checkAll(this)'>\n" +
+                "</th>\n" +
+                " <th>序号</th>\n" +
+                " <th>单据编号</th>\n" +
+                "  <th>账户编号</th>\n" +
+                "  <th>条目清单编号</th>\n" +
+                "   <th>总额</th>\n" +
+                "  <th>创建日期</th>\n" +
+                "  <th>创建者</th>\n" +
+                "  <th>修改日期</th>\n" +
+                " <th>修改者</th>\n" +
+                " <th>操作</th>\n" +
+                " </tr>";
+            return ss;
+        }
+
+
+        // dataType：告诉服务器，我要想什么类型的数据，如果没有指定，那么会自动推断是返回 XML，还是JSON，还是script，还是String。
+        // contentType: 告诉服务器，我要发什么类型的数据
+        // 查询单个的
+        function queryPay() {
+            var uName=document.getElementById("box1").value;
+
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/findOnePay",
+                cache: false,
+                data: {
+                    paymentId:uName
+
+
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+
+
+                    var tab = getTable();
+                    var str = "";
+                    for (var i = 0; i < data.length; i++) {
+                        var obj=data[i];
+                        var temp = "<tr>" +
+                            "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                            "<td>" + obj.paymentId + "</td>\n" +
+                            "  <td>" + obj.shipGoodsId  + "</td>\n" +
+                            "  <td>" + obj.accountId + "</td>" +
+                            "   <td>" + obj.detailedListId+ "</td>\n"+
+                            "   <td>" + obj.paymentTotsl+ "</td>\n"+
+                            "   <td>" + obj.paymentCreatDate+ "</td>\n"+
+                            "   <td>" + obj.paymentCrtator+ "</td>\n"+
+                            "   <td>" + obj.paymentModifyDate+ "</td>\n"+
+                            "   <td>" + obj.paymentReviser+ "</td>\n"+
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\" value='查看详情'> &nbsp;&nbsp;" +
+                            "<input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\" value='修改' onclick='openupateaPay(this)'> &nbsp;&nbsp;" +
+                            "<input type=\"button\" class='btn btn-warning btn-sm' data-target='' data-toggle='modal' name=\"deleteStu\" value='删除' onclick='deletePay(this)'> </td>" +
+                            "  </tr>";
+
+
+                        if (str.length== 0) {
+                            str = temp;
+                        } else {
+                            str = str + temp;
+                        }
+                        document.getElementById("myTable").innerHTML = tab + str;
+                    }
+                },
+                error: function (req, info, e) {
+
+                    alert("失败")
+                }
+            };
+            $.ajax(d);
+        }
+
+
+
+
+        //查询全部的
+        function queryAllPay() {
+
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/findAllPay",
+                cache: false,
+                data: {
+
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+
+
+                    var tab = getTable();
+                    var str = "";
+                    for (var i = 0; i < data.length; i++) {
+                        var obj=data[i];
+                        var temp = "<tr>" +
+                            "<td><input type=\"checkbox\" name=\"box\"></td>\n" +
+                            "<td>" + obj.paymentId + "</td>\n" +
+                            "  <td>" + obj.shipGoodsId  + "</td>\n" +
+
+                            "  <td>" + obj.accountId + "</td>" +
+                            "   <td>" + obj.detailedListId+ "</td>\n"+
+                            "   <td>" + obj.paymentTotsl+ "</td>\n"+
+                            "   <td>" + obj.paymentCreatDate+ "</td>\n"+
+                            "   <td>" + obj.paymentCrtator+ "</td>\n"+
+                            "   <td>" + obj.paymentModifyDate+ "</td>\n"+
+                            "   <td>" + obj.paymentReviser+ "</td>\n"+
+                            "<td><input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\" value='查看详情'> &nbsp;&nbsp;" +
+                            "<input type=\"button\" class='btn btn-primary btn-sm' data-target='#myModal1' data-toggle='modal' name=\"updataStu\" value='修改' onclick='openupateaPay(this)'> &nbsp;&nbsp;" +
+                            "<input type=\"button\" class='btn btn-warning btn-sm' data-target='' data-toggle='modal' name=\"deleteStu\" value='删除' onclick='deletePay(this)'> </td>" +
+                            "  </tr>";
+
+
+                        if (str.length== 0) {
+                            str = temp;
+                        } else {
+                            str = str + temp;
+                        }
+                        document.getElementById("myTable").innerHTML = tab + str;
+                    }
+                },
+                error: function (req, info, e) {
+
+                    alert("失败")
+                }
+            };
+            $.ajax(d);
+        }
+
+
+
+        function openupateaPay(obj)
+        {
+            var orderId=obj.parentNode.parentNode
+            var ordChildren=orderId.children
+            var id=ordChildren[1].innerHTML
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/findOpePaymentId",
+                cache: false,
+                data: {
+                    paymentId : id
+
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+                    var obj=data[0];
+                    document.getElementById("paymentId").value=id
+                    document.getElementById("shipGoodsId").value=obj.shipGoodsId
+                    document.getElementById("accountId").value=obj.accountId
+                    document.getElementById("detailedListId").value=obj.detailedListId
+                    document.getElementById("paymentTotsl").value=obj.paymentTotsl
+                    document.getElementById("paymentCreatDate").value=obj.paymentCreatDate
+                    document.getElementById("paymentCrtator").value=obj.paymentCrtator
+                    document.getElementById("paymentModifyDate").value=obj.paymentModifyDate
+                    document.getElementById("paymentReviser").value=obj.paymentReviser
+                    document.getElementById("paymentDelet").value=obj.paymentDelet
+                },
+                error: function (req, info, e) {
+                    alert("失败");
+
+                }
+            };
+            $.ajax(d);
+        }
+
+
+
+        function UpdatePay() {
+            var  paymentId = document.getElementById("paymentId").value
+            var shipGoodsId =document.getElementById("shipGoodsId").value
+            var accountId= document.getElementById("accountId").value
+            var detailedListId =document.getElementById("detailedListId").value
+            var paymentTotsl =document.getElementById("paymentTotsl").value
+            var paymentCreatDate =document.getElementById("paymentCreatDate").value
+            var paymentCrtator =document.getElementById("paymentCrtator").value
+            var paymentModifyDate= document.getElementById("paymentModifyDate").value
+            var paymentReviser =document.getElementById("paymentReviser").value
+            var paymentDelet =document.getElementById("paymentDelet").value
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/UpdatePay",
+                cache: false,
+                data: {
+                    paymentId:paymentId,
+                    shipGoodsId:shipGoodsId,
+                    accountId:accountId,
+                    detailedListId:detailedListId,
+                    paymentTotsl:paymentTotsl,
+                    paymentCreatDate:paymentCreatDate,
+                    paymentCrtator:paymentCrtator,
+                    paymentModifyDate:paymentModifyDate,
+                    paymentReviser:paymentReviser,
+                    paymentDelet:paymentDelet
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+
+                    alert("修改成功")
+                },
+                error: function (req, info, e) {
+                    alert(e);
+
+                }
+            };
+            $.ajax(d);
+
+        }
+
+
+
+        function  deletePay(obj){
+            var orderId=obj.parentNode.parentNode
+            var ordChildren=orderId.children
+            var id=ordChildren[1].innerHTML
+            var  paymentDelet= 0;
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/DeletePay",
+                cache: false,
+                data: {
+                    paymentId : id,
+                    paymentDelet:paymentDelet
+
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+                    queryAllPay();
+
+                },
+                error: function (req, info, e) {
+                    alert("失败");
+
+                }
+            };
+            $.ajax(d);
+
+        }
+
+
+
+
+
+        function  addPay(){
+            var  paymentId = document.getElementById("paymentIda").value;
+            var  shipGoodsId= document.getElementById("shipGoodsIda").value;
+            var  accountId = document.getElementById("accountIda").value;
+            var   detailedListId= document.getElementById("detailedListIda").value;
+            var   paymentTotsl= document.getElementById("paymentTotsla").value;
+            var   paymentCreatDate= document.getElementById("paymentCreatDatea").value;
+            var   paymentCrtator = document.getElementById("paymentCrtatora").value;
+            var  paymentModifyDate= document.getElementById("paymentModifyDatea").value;
+            var   paymentReviser = document.getElementById("paymentRevisera").value;
+            var  paymentDelet= document.getElementById("paymentDeleta").value;
+            var d = {
+                type: "get",
+                url: "http://localhost:8080/addPay",
+                cache: false,
+                data: {
+                    paymentId:paymentId,
+                    shipGoodsId:shipGoodsId,
+                    accountId:accountId,
+                    detailedListId:detailedListId,
+                    paymentTotsl:paymentTotsl,
+                    paymentCreatDate:paymentCreatDate,
+                    paymentCrtator:paymentCrtator,
+                    paymentModifyDate:paymentModifyDate,
+                    paymentReviser:paymentReviser,
+                    paymentDelet:paymentDelet
+
+
+
+                },
+                contentType: "application/json",
+                success: function (data) {
+                    alert("提交成功");
+                },
+                error: function (req, info, e) {
+                    alert("失败");
+
+                }
+            };
+            $.ajax(d);
+
+        }
+
+
+
+
+
+
+
+
+    </script>
+
+
+</head>
+<body onload="queryAllPay()">
+
+<div class="col-lg-8" style="width: 80%">
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search for..." Id="box1" >
+        <span class="input-group-btn">
+        <button style="margin-right:20px" class="btn btn-default" type="button" onclick="queryPay()">查询</button>
+            <!-- 新增模态框 -->
+<button type="button" class="btn btn-primary " data-toggle="modal" data-target="#myModal" onclick="">
+    新增
+</button>
+      </span>
+    </div>
+</div>
+<!-- 主页面表单-->
+<table class="table table-hover" id="myTable" style="text-align: left"  >
+
+
+</table>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <table border="1">
+                    <tr>
+                        <th>序号</th>
+                        <th><input type="text" value="SKD-yyyyMMdd-xxxxx" id="paymentIda"></th>
+                    </tr>
+                    <tr>
+                        <th>单据编号</th>
+                        <th><input type="text"  value="SKD-yyyyMMdd-xxxxx" id="shipGoodsIda"></th>
+                    </tr>
+                    <tr>
+                        <th>账户编号</th>
+                        <th><input type="text" id="accountIda" ></th>
+                    </tr>
+                    <tr>
+                        <th>条目清单编号</th>
+                        <th><input type="text" id="detailedListIda"></th>
+                    </tr>
+                    <tr>
+                        <th>总额</th>
+                        <th><input type="text" id="paymentTotsla"></th>
+                    </tr>
+                    <tr>
+                        <th>创建日期</th>
+                        <th><input type="text" id="paymentCreatDatea"></th>
+                    </tr>
+                    <tr>
+                        <th>创建者</th>
+                        <th><input type="text" id="paymentCrtatora"></th>
+                    </tr>
+                    <tr>
+                        <th>修改日期</th>
+                        <th><input type="text" id="paymentModifyDatea" ></th>
+                    </tr>
+                    <tr>
+                        <th>修改者</th>
+                        <th><input type="text" id="paymentRevisera"></th>
+                    </tr>
+                    <tr>
+                        <th>物理删除标志</th>
+                        <th><input type="text" value="1" id="paymentDeleta"></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="addPay()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+ 修改模态框
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel1">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <table border="1">
+                    <tr>
+                        <th>序号</th>
+                        <th><input type="text" id="paymentId"></th>
+                    </tr>
+                    <tr>
+                        <th>单据编号</th>
+                        <th><input type="text" id="shipGoodsId"></th>
+                    </tr>
+                    <tr>
+                        <th>账户编号</th>
+                        <th><input type="text" id="accountId"></th>
+                    </tr>
+                    <tr>
+                        <th>条目清单编号</th>
+                        <th><input type="text" id="detailedListId"></th>
+                    </tr>
+                    <tr>
+                        <th>总额</th>
+                        <th><input type="text" id="paymentTotsl"></th>
+                    </tr>
+                    <tr>
+                        <th>创建日期</th>
+                        <th><input type="text" id="paymentCreatDate"></th>
+                    </tr>
+                    <tr>
+                        <th>创建者</th>
+                        <th><input type="text" id="paymentCrtator"></th>
+                    </tr>
+                    <tr>
+                        <th>修改日期</th>
+                        <th><input type="text" id="paymentModifyDate"></th>
+                    </tr>
+                    <tr>
+                        <th>修改者</th>
+                        <th><input type="text" id="paymentReviser"></th>
+                    </tr>
+                    <tr>
+                        <th>物理删除标志</th>
+                        <th><input type="text" id="paymentDelet"></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="UpdatePay()">提交更改</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

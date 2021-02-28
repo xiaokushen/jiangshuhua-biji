@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.4.1.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css">
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+        .login-context{
+            width: 650px;
+            height: 375px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            box-shadow: rgba(17,17,17,0.7) 0 8px 8px;
+        }
+        .login-img{
+            width: 270px;
+            height: 375px;
+            border: none;
+            float: left;
+        }
+        .login-form{
+            width: 380px;
+            height: 375px;
+            border: none;
+            background-color:rgba(190,220,225,1);
+            float: left;
+        }
+        .input-style{
+            width: 280px;
+            height: 50px;
+            border: none;
+            border-radius: 25px;
+            font-size: 24px;
+            outline: none;
+            margin-bottom: 30px;
+            padding-left: 20px;
+        }
+
+        .input-btn{
+            width: 320px;
+            height: 50px;
+            border: none;
+            border-radius: 25px;
+            font-size: 24px;
+            outline: none;
+            margin: 0px 30px;
+        }
+        .input-btn:hover{
+            background-color:rgba(30,111,255,1);
+            color: #ffffff;
+        }
+    </style>
+    <link rel="stylesheet" href="../../static/css/bootstrap.css">
+</head>
+<body>
+<div class="login-context">
+    <div class="login-img">
+        <img src="img/timg.jpg" alt="">
+    </div>
+    <form action="" class="login-form">
+        <h1 style="text-align: center;line-height: 100px;color: #ffffff; ">进销存管理系统</h1>
+        <div style="margin: 0px 25px">
+            <span class="glyphicon glyphicon-user" aria-hidden="true" style="font-size: 24px; margin-right:10px;" title="用户名"></span>
+            <input type="text" class="input-style" id="userId">
+        </div>
+        <div style="margin: 0px 25px">
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true" style="font-size: 24px; margin-right:10px;" title="密码"></span>
+            <input type="password" class="input-style" id="userPsd">
+        </div>
+        <input type="button" class="input-btn" value="登录" onclick="loginBtn()">
+    </form>
+</div>
+<script>
+   
+    function loginBtn(){
+        var uId = document.getElementById("userId").value;
+        var userPsd = document.getElementById("userPsd").value;
+        var loginData = {
+            type:"post",
+            url:"/userLogin",
+            cache:false,
+            data:{
+                userId:uId,
+                userPsd:userPsd
+            },
+            dataType:"text",
+            success:function(data){
+                window.open('http://localhost:8080/user/index','_self');
+                alert(data);
+            },
+            error:function(){
+                alert("登录失败");
+            }
+        }
+        $.ajax(loginData);
+    }
+</script>
+</body>
+</html>
